@@ -4,8 +4,6 @@ class LocationComponent extends HTMLElement {
 
         this.attachShadow({ mode: "open" });
 
-        this.loadStyles();
-
         this.loadTemplate();
     }
 
@@ -26,23 +24,6 @@ class LocationComponent extends HTMLElement {
             }
         } catch (error) {
             console.error("Erreur : ", error);
-        }
-    }
-
-    async loadStyles() {
-        try {
-            const response = await fetch("css/inputLocation.css");
-            if (!response.ok) {
-                throw new Error("Erreur lors du chargement du CSS");
-            }
-
-            const cssText = await response.text();
-            const styleElement = document.createElement("style");
-            styleElement.textContent = cssText;
-
-            this.shadowRoot.appendChild(styleElement);
-        } catch (error) {
-            console.error("Erreur lors du chargement du CSS : ", error);
         }
     }
 
