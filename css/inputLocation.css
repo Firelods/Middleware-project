@@ -65,3 +65,36 @@
 #start-navigation:hover {
     background-color: #3b4ad9;
 }
+.autocomplete-dropdown {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    width: 90%;
+    max-height: 200px;
+    overflow-y: auto;
+    transform: translate(5%, -80%);
+    border-radius: 20px;
+    z-index: 999;
+}
+
+.autocomplete-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+}
+
+.autocomplete-item:hover {
+    background-color: #f0f0f0;
+}
+
+.map-icon::before {
+    content: url("../img/location_point.svg");
+    margin-right: 10px;
+}
+
+.location-icon::before {
+    content: url("../img/location_searching.svg");
+    margin-right: 10px;
+}
