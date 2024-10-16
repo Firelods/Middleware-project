@@ -11,18 +11,20 @@ var marker = L.marker([48.8566, 2.3522])
     .addTo(map)
     .bindPopup("Un marqueur à Paris.")
     .openPopup();
-function showCustomNotification(title, message) {
+    
+function showCustomNotification(title, message, type) {
   // Récupération du composant de notification par son ID
   const notificationComponent = document.getElementById("notification");
 
   // Appel de la méthode pour afficher la notification avec le titre et le message personnalisé
-  notificationComponent.showNotification(title, message);
+  notificationComponent.showNotification(title, message, type);
 }
 
 // Exemple d'appel pour tester
 document.addEventListener("DOMContentLoaded", () => {
   showCustomNotification(
     "Bienvenue !",
-    "Votre session a commencé avec succès."
+    "Votre session a commencé avec succès.",
+    "error"
   );
 });

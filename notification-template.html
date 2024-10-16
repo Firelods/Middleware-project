@@ -1,10 +1,10 @@
 <template>
-  
   <link rel="stylesheet" href="./css/notification.css" />
   <div class="notification">
     <div class="notif-icon-container">
-      <div class="notif-icon">
+      <div class="notif-icon ">
         <svg
+          class="info"
           width="28"
           height="28"
           viewBox="0 0 28 28"
@@ -26,14 +26,27 @@
             stroke-linejoin="round"
           />
         </svg>
+        <svg class="error"
+        xmlns="http://www.w3.org/2000/svg"
+        height="28px"
+        viewBox="0 -960 960 960"
+        width="28px"
+        fill="#BB271A"
+      >
+        <path
+          d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"
+        />
+      </svg>
       </div>
     </div>
+    
     <div class="notif-middle">
       <p class="notif-title">Titre de la notification</p>
       <p class="notif-message">
         Le message de la notification peut-être plus long que le titre
-      </p>
+      </p> 
     </div>
+    
     <div class="notif-cross">
       <button>
         <svg

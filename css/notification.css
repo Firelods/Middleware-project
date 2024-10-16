@@ -38,6 +38,10 @@
     padding :0.8em;
 }
 
+.notif-icon svg {
+    display: none; 
+  }
+
 .notif-middle {
     display : flex;
     flex-direction: column;

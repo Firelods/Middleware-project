@@ -31,27 +31,36 @@ class NotificationComponent extends HTMLElement {
     });
   }
 
-  async showNotification(title, message) {
+  async showNotification(title, message, type = "info") {
     await this.templateLoaded;
 
     const titleElement = this.shadowRoot.querySelector(".notif-title");
     const messageElement = this.shadowRoot.querySelector(".notif-message");
-    const notificationElement = this.shadowRoot.querySelector(".notification");
 
-    if (titleElement && messageElement && notificationElement) {
+    const infoIcon = this.shadowRoot.querySelector(".notif-icon svg.info");
+    const errorIcon = this.shadowRoot.querySelector(".notif-icon svg.error");
+
+    if (titleElement && messageElement && infoIcon && errorIcon) {
       titleElement.textContent = title;
       messageElement.textContent = message;
+
+      if (type === "info") {
+        infoIcon.style.display = "block";
+        errorIcon.style.display = "none";
+      } else if (type === "error") {
+        infoIcon.style.display = "none";
+        errorIcon.style.display = "block";
+      }
 
       this.style.visibility = "visible";
       this.style.opacity = "1";
 
       setTimeout(() => {
-        // Animation de fondu
         this.style.opacity = "0";
         setTimeout(() => {
           this.style.visibility = "hidden";
-        }, 300); 
-      }, 3000); 
+        }, 500);
+      }, 5000);
     } else {
       console.error("Les éléments de notification ne sont pas trouvés.");
     }
