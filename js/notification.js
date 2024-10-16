@@ -40,6 +40,8 @@ class NotificationComponent extends HTMLElement {
     const infoIcon = this.shadowRoot.querySelector(".notif-icon svg.info");
     const errorIcon = this.shadowRoot.querySelector(".notif-icon svg.error");
 
+    const closeButton = this.shadowRoot.querySelector(".notif-cross button");
+
     if (titleElement && messageElement && infoIcon && errorIcon) {
       titleElement.textContent = title;
       messageElement.textContent = message;
@@ -54,6 +56,13 @@ class NotificationComponent extends HTMLElement {
 
       this.style.visibility = "visible";
       this.style.opacity = "1";
+
+      closeButton.addEventListener("click", () => {
+        this.style.opacity = "0";
+        setTimeout(() => {
+          this.style.visibility = "hidden";
+        }, 300); // Correspond à la durée de l'animation de fondu
+      });
 
       setTimeout(() => {
         this.style.opacity = "0";
