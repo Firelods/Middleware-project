@@ -7,7 +7,9 @@ class LocationComponent extends HTMLElement {
 
     async loadTemplate() {
         try {
-            const response = await fetch("location-template.html");
+            const response = await fetch(
+                "input-location/location-template.html"
+            );
             if (!response.ok) {
                 throw new Error("Erreur lors du chargement du template");
             }

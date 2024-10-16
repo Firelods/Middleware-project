@@ -1,0 +1,68 @@
+<template>
+    <link rel="stylesheet" href="./notification/notification.css" />
+    <div class="notification">
+        <div class="notif-icon-container">
+            <div class="notif-icon">
+                <svg
+                    class="info"
+                    width="28"
+                    height="28"
+                    viewBox="0 0 28 28"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M14 25.6667C17.2216 25.6667 20.1383 24.3608 22.2496 22.2496C24.3608 20.1383 25.6667 17.2216 25.6667 14C25.6667 10.7784 24.3608 7.86171 22.2496 5.75043C20.1383 3.63918 17.2216 2.33334 14 2.33334C10.7784 2.33334 7.86169 3.63918 5.75041 5.75043C3.63917 7.86171 2.33333 10.7784 2.33333 14C2.33333 17.2216 3.63917 20.1383 5.75041 22.2496C7.86169 24.3608 10.7784 25.6667 14 25.6667Z"
+                        fill="#F5F5F5"
+                        stroke="#5271FF"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                    />
+                    <path
+                        d="M9.33333 14L12.8333 17.5L19.8333 10.5"
+                        stroke="#5271FF"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    />
+                </svg>
+                <svg
+                    class="error"
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="28px"
+                    viewBox="0 -960 960 960"
+                    width="28px"
+                    fill="#BB271A"
+                >
+                    <path
+                        d="m40-120 440-760 440 760H40Zm138-80h604L480-720 178-200Zm302-40q17 0 28.5-11.5T520-280q0-17-11.5-28.5T480-320q-17 0-28.5 11.5T440-280q0 17 11.5 28.5T480-240Zm-40-120h80v-200h-80v200Zm40-100Z"
+                    />
+                </svg>
+            </div>
+        </div>
+
+        <div class="notif-middle">
+            <p class="notif-title">Titre de la notification</p>
+            <p class="notif-message">
+                Le message de la notification peut-être plus long que le titre
+            </p>
+        </div>
+
+        <div class="notif-cross">
+            <button>
+                <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M8 6.2225L14.2225 0L16 1.7775L9.7775 8L16 14.2225L14.2225 16L8 9.7775L1.7775 16L0 14.2225L6.2225 8L0 1.7775L1.7775 0L8 6.2225Z"
+                        fill="#4F4F4F"
+                    />
+                </svg>
+            </button>
+        </div>
+    </div>
+</template>
