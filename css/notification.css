@@ -11,16 +11,14 @@
 .notification {
     background-color: white;
     width: 95vw;
-    display: grid;
+    display: flex;
+    gap:1em;
     position: absolute;
     left: 50%;
     transform: translate(-50%, 3vw);
-    display: grid;
-    grid: 40% auto / 20% auto 20%;
-    border-radius: 10px;
+    border-radius: 20px;
     box-shadow: 0 20px 20px rgba(119, 119, 119, 0.1);
-    padding: 2vh 2vw 2vh 2vw;
-    grid-column-gap: 1vw;
+    padding: 12px ;
     margin: 0 auto; 
     z-index: 999;
 }
@@ -28,8 +26,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    grid-column: 1;
-    grid-row: 1/3;
 }
 
 .notif-icon {
@@ -39,36 +35,34 @@
     padding :0.8em;
 }
 
+.notif-middle {
+    display : flex;
+    flex-direction: column;
+}
+
 .notif-title {
-    grid-column: 2;
-    grid-row: 1;
     font-weight: bold;
     margin: auto 0;
 }
 
 .notif-message {
-    grid-column: 2;
-    grid-row: 2;
     color: grey;
     
 }
 
 .notif-cross {
-    grid-column: 3;
-    grid-row: 1/3;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 85%;
 }
 .notif-cross button {
     width: 3em;
     height: 3em;
-    border-radius: 50%;
     border: none;
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 50%;
 }
 
 .notif-cross svg {
