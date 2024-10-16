@@ -5,7 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="css/main.css" />
         <link rel="stylesheet" href="css/notification.css" />
-        <script src="js/main.js"></script>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+        />
+        <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
         <title>Middleware Project</title>
     </head>
     <body>
@@ -55,8 +60,11 @@
                 </button>
             </div>
         </div>
+        <div id="map"></div>
+
         <location-component></location-component>
     </body>
 
     <script src="js/inputLocation.js" type="module"></script>
+    <script src="js/main.js"></script>
 </html>

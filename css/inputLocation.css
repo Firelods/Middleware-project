@@ -12,6 +12,7 @@
     width: 100vw;
     display: flex;
     flex-direction: column;
+    z-index: 9;
     align-items: center;
 }
 

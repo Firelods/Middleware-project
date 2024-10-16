@@ -11,9 +11,10 @@
     display: grid;
     grid: 40% auto / 20% auto 20%;
     border-radius: 10px;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 20px 20px 0px rgba(0, 0, 0, 0.08);
     padding: 1vh 1vw;
     grid-column-gap: 1vw;
+    z-index: 999;
 }
 
 .notif-icon {
