@@ -13,6 +13,31 @@ window.addEventListener("centerMap", (event) => {
     L.marker([lat, lon]).addTo(map).bindPopup("Vous êtes ici").openPopup();
 });
 
+window.addEventListener("displayInstructionComponent", (event) => {
+    displayInputLocationComponent(false);
+    displayInstructionComponent(true);
+});
+
+window.addEventListener("displayInputLocationComponent", (event) => {
+    displayInstructionComponent(false);
+    displayInputLocationComponent(true);
+});
+
+window.addEventListener("displayNotif", (event) => {
+    const { title, message, type } = event.detail;
+    showCustomNotification(title, message, type);
+});
+
+function displayInputLocationComponent(display){
+    const inputLocationComponent = document.getElementById("inputLocationComponent");
+    inputLocationComponent.style.display = display ? "block" : "none";
+}
+
+function displayInstructionComponent(display){
+    const instructionComponent = document.getElementById("instructionComponent");
+    instructionComponent.style.display = display ? "block" : "none";
+}
+
 function showCustomNotification(title, message, type) {
     // Récupération du composant de notification par son ID
     const notificationComponent = document.getElementById("notification");
@@ -21,11 +46,11 @@ function showCustomNotification(title, message, type) {
     notificationComponent.showNotification(title, message, type);
 }
 
-// Exemple d'appel pour tester
-document.addEventListener("DOMContentLoaded", () => {
-    showCustomNotification(
-        "Bienvenue !",
-        "Votre session a commencé avec succès.",
-        "error"
-    );
-});
+// // Exemple d'appel pour tester
+// document.addEventListener("DOMContentLoaded", () => {
+//     showCustomNotification(
+//         "Bienvenue !",
+//         "Votre session a commencé avec succès.",
+//         "error"
+//     );
+// });
