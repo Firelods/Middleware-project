@@ -15,5 +15,5 @@ body {
 }
 
 #instructionComponent{
-    display: block;
+    display: none;
 }
