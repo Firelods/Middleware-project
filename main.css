@@ -8,7 +8,12 @@
 body {
     background-color: grey;
 }
+
 #map {
     height: 70vh;
     z-index: 1;
+}
+
+#instructionComponent{
+    display: block;
 }
