@@ -7,9 +7,7 @@ class LocationComponent extends HTMLElement {
 
   async loadTemplate() {
     try {
-      const response = await fetch(
-        "bottom-container/input-location/location-template.html"
-      );
+      const response = await fetch("input-location/location-template.html");
       if (!response.ok) {
         throw new Error("Erreur lors du chargement du template");
       }
@@ -40,12 +38,26 @@ class LocationComponent extends HTMLElement {
     departureInput.addEventListener("click", (event) => {
       this.autocomplete(event.target.value, "departure");
     });
+    departureInput.addEventListener("focusout", () => {
+      const dropdown = this.shadowRoot.getElementById("departure-dropdown");
+      setTimeout(() => {
+        dropdown.innerHTML = "";
+        dropdown.remove();
+      });
+    });
 
     arrivalInput.addEventListener("input", (event) => {
       this.autocomplete(event.target.value, "arrival");
     });
     arrivalInput.addEventListener("click", (event) => {
       this.autocomplete(event.target.value, "arrival");
+    });
+    arrivalInput.addEventListener("focusout", () => {
+      const dropdown = this.shadowRoot.getElementById("arrival-dropdown");
+      setTimeout(() => {
+        dropdown.innerHTML = "";
+        dropdown.remove();
+      }, 200);
     });
 
     startNavigationButton.addEventListener("click", () => {
@@ -105,6 +117,13 @@ class LocationComponent extends HTMLElement {
     const dropdownId = `${inputId}-dropdown`;
 
     let dropdown = this.shadowRoot.getElementById(dropdownId);
+    // if other dropdown exists, remove it
+    const otherDropdown = this.shadowRoot.querySelector(
+      ".autocomplete-dropdown"
+    );
+    if (otherDropdown && otherDropdown !== dropdown) {
+      otherDropdown.remove();
+    }
     if (!dropdown) {
       dropdown = document.createElement("div");
       dropdown.id = dropdownId;
@@ -131,7 +150,11 @@ class LocationComponent extends HTMLElement {
       });
       dropdown.appendChild(suggestionItem);
     });
-
+    dropdown.scrollTop = dropdown.offsetHeight;
+    if (suggestions.length > 0) {
+      console.log("suggestions not empty");
+      return;
+    }
     const mapOption = document.createElement("div");
     mapOption.className = "autocomplete-item map-icon";
     mapOption.textContent = "Pick point on map";
