@@ -1,4 +1,7 @@
+import { ApiClient } from "/service/api-client.js";
 class LocationComponent extends HTMLElement {
+    chosenLocation = {};
+
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -64,18 +67,33 @@ class LocationComponent extends HTMLElement {
         });
 
         startNavigationButton.addEventListener("click", () => {
+            console.log("Start navigation button clicked");
+            console.log(this.chosenLocation);
             const departure = this.shadowRoot.getElementById("departure").value;
+            const departureLat = this.chosenLocation.departureLat;
+            const departureLon = this.chosenLocation.departureLon;
             const arrival = this.shadowRoot.getElementById("arrival").value;
+            const arrivalLat = this.chosenLocation.arrivalLat;
+            const arrivalLon = this.chosenLocation.arrivalLon;
+            const city = this.chosenLocation.city;
 
-            if (departure && arrival) {
-                window.dispatchEvent(
-                    new CustomEvent("displayNotif", {
-                        detail: {
-                            title: "Navigation lancée",
-                            message: `Navigation lancée de ${departure} à ${arrival}`,
-                            type: "info",
-                        },
-                    })
+            if (
+                departure &&
+                arrival &&
+                departureLat &&
+                departureLon &&
+                arrivalLat &&
+                arrivalLon &&
+                city
+            ) {
+                this.startItinerary(
+                    departure,
+                    arrival,
+                    departureLat,
+                    departureLon,
+                    arrivalLat,
+                    arrivalLon,
+                    city
                 );
             } else {
                 window.dispatchEvent(
@@ -89,12 +107,48 @@ class LocationComponent extends HTMLElement {
                     })
                 );
             }
-            window.dispatchEvent(
-                new CustomEvent("displayInstructionComponent")
-            );
         });
     }
 
+    startItinerary(
+        departure,
+        arrival,
+        departureLat,
+        departureLon,
+        arrivalLat,
+        arrivalLon,
+        city
+    ) {
+        const apiClient = new ApiClient("http://localhost:8081");
+        apiClient
+            .getItinerary(
+                departureLat,
+                departureLon,
+                arrivalLat,
+                arrivalLon,
+                "vitesse",
+                city
+            )
+            .then((data) => {
+                console.log("Données reçues:", data);
+                window.dispatchEvent(
+                    new CustomEvent("displayNotif", {
+                        detail: {
+                            title: "Navigation lancée",
+                            message: `Navigation lancée de ${departure} à ${arrival}`,
+                            type: "info",
+                        },
+                    })
+                );
+                window.dispatchEvent(
+                    new CustomEvent("displayInstructionComponent")
+                );
+            })
+            .catch((error) => {
+                console.error("Erreur:", error);
+            });
+    }
+    
     async autocomplete(query, inputId) {
         const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
             query
@@ -154,6 +208,10 @@ class LocationComponent extends HTMLElement {
                 dropdown.remove();
                 // Si l'utilisateur a sélectionné une adresse, on centre la carte sur cette adresse
                 const [lon, lat] = suggestion.geometry.coordinates;
+                this.chosenLocation[`${inputId}Lat`] = lat;
+                this.chosenLocation[`${inputId}Lon`] = lon;
+                this.chosenLocation[`city`] = suggestion.properties.city.toLowerCase();
+                console.log(this.chosenLocation);
                 this.centerMapOnLocation(lat, lon);
             });
             dropdown.appendChild(suggestionItem);
