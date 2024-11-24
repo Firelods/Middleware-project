@@ -8,6 +8,10 @@
             rel="stylesheet"
             href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
         />
+        <script src="
+        https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js
+        "></script>
+
         <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
         <title>Middleware Project</title>
@@ -15,7 +19,7 @@
     <body>
         <notification-component id="notification"></notification-component>
         <div id="map"></div>
-
+<div id="messageContainer"></div>
         <location-component id="inputLocationComponent"></location-component>
         <instructions-component id="instructionComponent"></instructions-component>
     </body>
@@ -23,6 +27,7 @@
     <script src="bottom-container/input-location/inputLocation.js" type="module"></script>
     <script src="bottom-container/instructions/instructions.js" type="module"></script>
     <script src="notification/notification.js" type="module"></script>
+    <script src="service/message-client.js" type="module"></script>
     <script src="service/api-client.js" type="module"></script>
     <script src="main.js"></script>
 </html>

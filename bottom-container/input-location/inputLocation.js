@@ -76,7 +76,8 @@ class LocationComponent extends HTMLElement {
             const arrivalLat = this.chosenLocation.arrivalLat;
             const arrivalLon = this.chosenLocation.arrivalLon;
             const city = this.chosenLocation.city;
-
+            console.log(departure, arrival, departureLat, departureLon, arrivalLat, arrivalLon, city);
+            
             if (
                 departure &&
                 arrival &&
@@ -119,6 +120,8 @@ class LocationComponent extends HTMLElement {
         arrivalLon,
         city
     ) {
+        console.log("Lancement de la navigation");
+        
         const apiClient = new ApiClient("http://localhost:8081");
         apiClient
             .getItinerary(

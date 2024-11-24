@@ -22,6 +22,7 @@ class InstructionsComponent extends HTMLElement {
       if (template) {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.addEventListeners();
+        this.listenForNewInstructions();
       }
     } catch (error) {
       console.error("Erreur : ", error);
@@ -29,43 +30,64 @@ class InstructionsComponent extends HTMLElement {
   }
 
   addEventListeners() {
+    // Bouton pour arrêter la navigation
     const stopNavigationButton =
       this.shadowRoot.getElementById("stop-navigation");
     stopNavigationButton.addEventListener("click", () => {
       window.dispatchEvent(new CustomEvent("displayInputLocationComponent"));
     });
+
+    // Instruction cliquable pour demander la suivante
+    const directionInstructions =
+      this.shadowRoot.getElementById("instruction");
+    directionInstructions.addEventListener("click", () => {
+      window.dispatchEvent(
+        new CustomEvent("requestNextInstruction", {
+          detail: {
+            currentInstruction: directionInstructions.textContent,
+          },
+        })
+      );
+    });
+  }
+
+  listenForNewInstructions() {
+    // Écoute des nouvelles instructions depuis les événements globaux
+    window.addEventListener("newInstruction", (event) => {
+      const { instruction, direction, distance, duration } = event.detail;
+
+      this.updateDirectionInstructions(instruction);
+      this.updateDirectionIcon(direction);
+      this.updateArrivalTimeFromDuration(duration);
+
+      console.log(`Instruction mise à jour : ${instruction}`);
+    });
+  }
+
+  updateArrivalTimeFromDuration(duration) {
+    const currentDate = new Date();
+    const minutesToAdd = Math.ceil(duration);
+    const arrivalDate = new Date(currentDate.getTime() + minutesToAdd * 60000);
+
+    this.updateArrivalTime(arrivalDate.getHours(), arrivalDate.getMinutes());
   }
 
   updateArrivalTime(hour, minutes) {
-    if (!hour || !minutes) {
-      console.error("Heure ou minutes manquantes");
-      return;
-    }
-    if (hour < 0 || hour > 23) {
-      console.error("Heure invalide");
-      return;
-    }
-    if (minutes < 0 || minutes > 59) {
-      console.error("Minutes invalides");
-      return;
-    }
-    if (hour < 10) {
-      hour = "0" + hour;
-    }
-    if (minutes < 10) {
-      minutes = "0" + minutes;
-    }
-    const arrivalTime = document.getElementById("arrival");
-    arrivalTime.textContent = `${hour}h${minutes}`;
+    const formattedHour = hour < 10 ? `0${hour}` : hour;
+    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    const arrivalTime = this.shadowRoot.getElementById("arrival");
+    arrivalTime.textContent = `${formattedHour}h${formattedMinutes}`;
   }
 
-  udpateDirectionIcon(direction) {
-    const directionIcon = document.getElementById("direction-icon");
+  updateDirectionIcon(direction) {
+    const directionIcon = this.shadowRoot.getElementById("direction-icon");
     directionIcon.src = `img/directions-icon/${direction}.svg`;
   }
 
   updateDirectionInstructions(instructions) {
-    const directionInstructions = document.getElementById("instruction");
+    const directionInstructions =
+      this.shadowRoot.getElementById("instruction");
     directionInstructions.textContent = instructions;
   }
 }
