@@ -5,12 +5,14 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
+window.addEventListener("addMarker", (event) => {
+    const { lat, lon, message } = event.detail;
+    L.marker([lat, lon]).addTo(map).bindPopup(message).openPopup();
+});
+
 window.addEventListener("centerMap", (event) => {
     const { lat, lon } = event.detail;
-
-    map.setView([lat, lon], 13); // Recentrer la carte sur la position de l'utilisateur
-
-    L.marker([lat, lon]).addTo(map).bindPopup("Vous êtes ici").openPopup();
+    centerMap(lat, lon); // Recentrer la carte sur la position de l'utilisateur
 });
 
 window.addEventListener("displayInstructionComponent", (event) => {
@@ -27,6 +29,10 @@ window.addEventListener("displayNotif", (event) => {
     const { title, message, type } = event.detail;
     showCustomNotification(title, message, type);
 });
+
+function centerMap(lat, lon) {
+    map.setView([lat, lon], 13);
+}
 
 function displayInputLocationComponent(display) {
     const inputLocationComponent = document.getElementById(
@@ -64,7 +70,7 @@ function displayItineraryOnMap(itinerary) {
         }
     ).addTo(map);
 
-    // map.fitBounds(leafletPolyline.getBounds());
+    map.fitBounds(currentPolyline.getBounds());
 }
 
 window.addEventListener("drawItinerary", (event) => {

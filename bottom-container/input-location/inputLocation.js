@@ -226,6 +226,11 @@ class LocationComponent extends HTMLElement {
                     suggestion.properties.city.toLowerCase();
                 console.log(this.chosenLocation);
                 this.centerMapOnLocation(lat, lon);
+                const message =
+                    inputId === "departure"
+                        ? "Vous partez d'ici"
+                        : "Vous arrivez ici";
+                this.addMarkerOnMap(lat, lon, message);
             });
             dropdown.appendChild(suggestionItem);
         });
@@ -290,6 +295,11 @@ class LocationComponent extends HTMLElement {
     centerMapOnLocation(lat, lon) {
         window.dispatchEvent(
             new CustomEvent("centerMap", { detail: { lat, lon } })
+        );
+    }
+    addMarkerOnMap(lat, lon, message) {
+        window.dispatchEvent(
+            new CustomEvent("addMarker", { detail: { lat, lon, message } })
         );
     }
 }
