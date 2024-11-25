@@ -5,9 +5,30 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
+let departureMarker;
+let arrivalMarker;
 window.addEventListener("addMarker", (event) => {
-    const { lat, lon, message } = event.detail;
-    L.marker([lat, lon]).addTo(map).bindPopup(message).openPopup();
+    console.log(event.detail);
+    const { lat, lon, inputId } = event.detail;
+    if (inputId == "departure") {
+        if (departureMarker) {
+            departureMarker.remove();
+        }
+        departureMarker = L.marker([lat, lon])
+            .addTo(map)
+            .bindPopup("Vous partez d'ici");
+        departureMarker.openPopup();
+    } else if (inputId == "arrival") {
+        if (arrivalMarker) {
+            arrivalMarker.remove();
+        }
+        arrivalMarker = L.marker([lat, lon])
+            .addTo(map)
+            .bindPopup("Vous arrivez ici");
+        arrivalMarker.openPopup();
+    } else {
+        console.error("inputId not found when adding marker");
+    }
 });
 
 window.addEventListener("centerMap", (event) => {
@@ -70,7 +91,9 @@ function displayItineraryOnMap(itinerary) {
         }
     ).addTo(map);
 
-    map.fitBounds(currentPolyline.getBounds());
+    map.fitBounds(currentPolyline.getBounds(), {
+        padding: [30, 30],
+    });
 }
 
 window.addEventListener("drawItinerary", (event) => {
