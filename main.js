@@ -28,13 +28,17 @@ window.addEventListener("displayNotif", (event) => {
     showCustomNotification(title, message, type);
 });
 
-function displayInputLocationComponent(display){
-    const inputLocationComponent = document.getElementById("inputLocationComponent");
+function displayInputLocationComponent(display) {
+    const inputLocationComponent = document.getElementById(
+        "inputLocationComponent"
+    );
     inputLocationComponent.style.display = display ? "block" : "none";
 }
 
-function displayInstructionComponent(display){
-    const instructionComponent = document.getElementById("instructionComponent");
+function displayInstructionComponent(display) {
+    const instructionComponent = document.getElementById(
+        "instructionComponent"
+    );
     instructionComponent.style.display = display ? "block" : "none";
 }
 
@@ -46,11 +50,33 @@ function showCustomNotification(title, message, type) {
     notificationComponent.showNotification(title, message, type);
 }
 
-// // Exemple d'appel pour tester
-// document.addEventListener("DOMContentLoaded", () => {
-//     showCustomNotification(
-//         "Bienvenue !",
-//         "Votre session a commencé avec succès.",
-//         "error"
-//     );
-// });
+let currentPolyline;
+function displayItineraryOnMap(itinerary) {
+    if (currentPolyline) {
+        currentPolyline.remove();
+    }
+    const decodedPolyline = polyline.decode(itinerary);
+    currentPolyline = L.polyline(
+        decodedPolyline.map(([lat, lng]) => [lat, lng]),
+        {
+            color: "blue",
+            weight: 5,
+        }
+    ).addTo(map);
+
+    // map.fitBounds(leafletPolyline.getBounds());
+}
+
+window.addEventListener("drawItinerary", (event) => {
+    displayItineraryOnMap(event.detail.polyline);
+});
+
+window.addEventListener("stopNavigation", (event) => {
+    hideItineraryOnMap();
+});
+
+function hideItineraryOnMap() {
+    if (currentPolyline) {
+        currentPolyline.remove();
+    }
+}

@@ -144,6 +144,15 @@ class LocationComponent extends HTMLElement {
                     })
                 );
                 window.dispatchEvent(
+                    new CustomEvent("drawItinerary", {
+                        detail: {
+                            polyline:
+                                data.GetItineraryResult.Route.Routes[0]
+                                    .Geometry,
+                        },
+                    })
+                );
+                window.dispatchEvent(
                     new CustomEvent("displayInstructionComponent")
                 );
             })
@@ -151,7 +160,7 @@ class LocationComponent extends HTMLElement {
                 console.error("Erreur:", error);
             });
     }
-    
+
     async autocomplete(query, inputId) {
         const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
             query
@@ -213,7 +222,8 @@ class LocationComponent extends HTMLElement {
                 const [lon, lat] = suggestion.geometry.coordinates;
                 this.chosenLocation[`${inputId}Lat`] = lat;
                 this.chosenLocation[`${inputId}Lon`] = lon;
-                this.chosenLocation[`city`] = suggestion.properties.city.toLowerCase();
+                this.chosenLocation[`city`] =
+                    suggestion.properties.city.toLowerCase();
                 console.log(this.chosenLocation);
                 this.centerMapOnLocation(lat, lon);
             });
