@@ -67,8 +67,6 @@ class LocationComponent extends HTMLElement {
         });
 
         startNavigationButton.addEventListener("click", () => {
-            console.log("Start navigation button clicked");
-            console.log(this.chosenLocation);
             const departure = this.shadowRoot.getElementById("departure").value;
             const departureLat = this.chosenLocation.departureLat;
             const departureLon = this.chosenLocation.departureLon;
@@ -76,15 +74,6 @@ class LocationComponent extends HTMLElement {
             const arrivalLat = this.chosenLocation.arrivalLat;
             const arrivalLon = this.chosenLocation.arrivalLon;
             const city = this.chosenLocation.city;
-            console.log(
-                departure,
-                arrival,
-                departureLat,
-                departureLon,
-                arrivalLat,
-                arrivalLon,
-                city
-            );
 
             if (
                 departure &&
@@ -209,8 +198,6 @@ class LocationComponent extends HTMLElement {
     }
 
     showSuggestions(suggestions, inputId) {
-        console.log(suggestions);
-
         const inputElement = this.shadowRoot.getElementById(inputId);
         const dropdownId = `${inputId}-dropdown`;
 
@@ -248,7 +235,6 @@ class LocationComponent extends HTMLElement {
                 this.chosenLocation[`${inputId}Lon`] = lon;
                 this.chosenLocation[`city`] =
                     suggestion.properties.city.toLowerCase();
-                console.log(this.chosenLocation);
                 this.centerMapOnLocation(lat, lon);
                 this.addMarkerOnMap(lat, lon, inputId);
             });
@@ -256,7 +242,6 @@ class LocationComponent extends HTMLElement {
         });
         dropdown.scrollTop = dropdown.offsetHeight;
         if (suggestions.length > 0) {
-            console.log("suggestions not empty");
             return;
         }
         const mapOption = document.createElement("div");

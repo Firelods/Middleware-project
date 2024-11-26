@@ -8,7 +8,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 let departureMarker;
 let arrivalMarker;
 window.addEventListener("addMarker", (event) => {
-    console.log(event.detail);
     const { lat, lon, inputId } = event.detail;
     if (inputId == "departure") {
         if (departureMarker) {
@@ -174,10 +173,6 @@ function displayHubsOnMap(hub1, hub2) {
 
 window.addEventListener("showHubs", (event) => {
     const { hub1, hub2 } = event.detail;
-    console.log(hub1, hub2);
-    console.log("showHubs");
-    
-    
     displayHubsOnMap(hub1, hub2);
 });
 
