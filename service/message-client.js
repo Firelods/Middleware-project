@@ -13,9 +13,9 @@ export class MessageClient {
                 login: "admin", // Nom d'utilisateur configuré dans le broker
                 passcode: "admin", // Mot de passe configuré dans le broker
             },
-            debug: (str) => {
-                console.log("StompJS Debug:", str);
-            },
+            // debug: (str) => {
+            //     console.log("StompJS Debug:", str);
+            // },
             reconnectDelay: 5000, // Délai de reconnexion automatique
             heartbeatIncoming: 4000, // Battement cardiaque pour les messages entrants
             heartbeatOutgoing: 4000, // Battement cardiaque pour les messages sortants
@@ -24,7 +24,7 @@ export class MessageClient {
         // Connecter au broker
         this.stompClient.onConnect = () => {
             console.log("Connecté au broker ActiveMQ.");
-            this.subscribeToQueue("/queue/itinerary-updates"); // S'abonner à la queue spécifiée
+            this.subscribeToQueue("/queue/itinerary-updates."+this.userId); // S'abonner à la queue spécifiée
         };
 
         // Gestion des erreurs
@@ -32,9 +32,10 @@ export class MessageClient {
             console.error("Erreur Stomp:", frame.headers["message"]);
             console.error("Détails:", frame.body);
         };
-
-        this.stompClient.activate(); // Activer le client Stomp
+        this.handleUpdateRequest();
+        this.stompClient.activate(); 
     }
+
 
     // S'abonner à une queue ActiveMQ
     subscribeToQueue(queueName) {
@@ -44,19 +45,33 @@ export class MessageClient {
         });
     }
 
+    handleUpdateRequest() {
+        window.addEventListener("requestNextInstruction", (event) => {
+            this.sendUpdateRequest();
+        });
+    }
+
+    sendUpdateRequest() {
+        this.stompClient.publish({
+            destination: "/queue/request-updates."+this.userId,
+            body: JSON.stringify({
+                UserId: this.userId,
+                type:"update",
+            }),
+        });
+    }
+
     // Gérer les messages reçus
     handleMessage(message) {
-        console.log(message.UserId, this.userId);
-        
-        if (message.UserId === this.userId) {
-            console.log("Message reçu pour cet utilisateur:", message);
+
+        if (message.UserId === this.userId && message.type != "update") {
 
             // Émettre un événement global avec les détails de l'instruction
             window.dispatchEvent(
                 new CustomEvent("newInstruction", {
                     detail: {
                         instruction: message.Instruction,
-                        direction: message.Name,
+                        direction: message.Type,
                         distance: message.Distance,
                         duration: message.Duration,
                     },

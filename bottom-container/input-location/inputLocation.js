@@ -76,8 +76,16 @@ class LocationComponent extends HTMLElement {
             const arrivalLat = this.chosenLocation.arrivalLat;
             const arrivalLon = this.chosenLocation.arrivalLon;
             const city = this.chosenLocation.city;
-            console.log(departure, arrival, departureLat, departureLon, arrivalLat, arrivalLon, city);
-            
+            console.log(
+                departure,
+                arrival,
+                departureLat,
+                departureLon,
+                arrivalLat,
+                arrivalLon,
+                city
+            );
+
             if (
                 departure &&
                 arrival &&
@@ -121,7 +129,7 @@ class LocationComponent extends HTMLElement {
         city
     ) {
         console.log("Lancement de la navigation");
-        
+
         const apiClient = new ApiClient("http://localhost:8081");
         apiClient
             .getItinerary(
@@ -146,12 +154,28 @@ class LocationComponent extends HTMLElement {
                 window.dispatchEvent(
                     new CustomEvent("drawItinerary", {
                         detail: {
-                            polyline:
+                            polylineFoot1:
                                 data.GetItineraryResult.Route.Routes[0]
-                                    .Geometry,
+                                    .GeometryFoot1,
+                            polylineFoot2:
+                                data.GetItineraryResult.Route.Routes[0]
+                                    .GeometryFoot2,
+                            polylineBike:
+                                data.GetItineraryResult.Route.Routes[0]
+                                    .GeometryBike,
                         },
                     })
                 );
+                if (data.GetItineraryResult.Details.StartStation) {
+                    window.dispatchEvent(
+                        new CustomEvent("showHubs", {
+                            detail: {
+                                hub1: data.GetItineraryResult.Details.StartStation,
+                                hub2: data.GetItineraryResult.Details.EndStation,
+                            },
+                        })
+                    );
+                }
                 window.dispatchEvent(
                     new CustomEvent("displayInstructionComponent")
                 );

@@ -77,27 +77,108 @@ function showCustomNotification(title, message, type) {
     notificationComponent.showNotification(title, message, type);
 }
 
-let currentPolyline;
-function displayItineraryOnMap(itinerary) {
-    if (currentPolyline) {
-        currentPolyline.remove();
-    }
-    const decodedPolyline = polyline.decode(itinerary);
-    currentPolyline = L.polyline(
-        decodedPolyline.map(([lat, lng]) => [lat, lng]),
-        {
-            color: "blue",
-            weight: 5,
-        }
-    ).addTo(map);
+let currentPolylines = []; // Liste pour gérer toutes les polylignes
 
-    map.fitBounds(currentPolyline.getBounds(), {
-        padding: [30, 30],
-    });
+function displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike) {
+    // Supprimez les anciennes polylignes
+    currentPolylines.forEach((polyline) => polyline.remove());
+    currentPolylines = [];
+
+    // Ajouter la polyligne en vélo (ligne continue)
+    if (polylineBike) {
+        const decodedBike = polyline.decode(polylineBike);
+        const bikePolyline = L.polyline(
+            decodedBike.map(([lat, lng]) => [lat, lng]),
+            {
+                color: "blue",
+                weight: 5,
+            }
+        ).addTo(map);
+        currentPolylines.push(bikePolyline);
+    }
+
+    // Ajouter les polylignes à pied (en pointillé)
+    if (polylineFoot1) {
+        const decodedFoot1 = polyline.decode(polylineFoot1);
+        const footPolyline1 = L.polyline(
+            decodedFoot1.map(([lat, lng]) => [lat, lng]),
+            {
+                color: "green",
+                weight: 5,
+                dashArray: "10, 10", // Pointillé
+            }
+        ).addTo(map);
+        currentPolylines.push(footPolyline1);
+    }
+
+    if (polylineFoot2) {
+        const decodedFoot2 = polyline.decode(polylineFoot2);
+        const footPolyline2 = L.polyline(
+            decodedFoot2.map(([lat, lng]) => [lat, lng]),
+            {
+                color: "green",
+                weight: 5,
+                dashArray: "10, 10", // Pointillé
+            }
+        ).addTo(map);
+        currentPolylines.push(footPolyline2);
+    }
+
+    if (currentPolylines.length > 0) {
+        const allBounds = currentPolylines.map((polyline) =>
+            polyline.getBounds()
+        );
+        const combinedBounds = allBounds.reduce((acc, bounds) =>
+            acc.extend(bounds)
+        );
+        map.fitBounds(combinedBounds, {
+            padding: [30, 30],
+        });
+    }
 }
 
 window.addEventListener("drawItinerary", (event) => {
-    displayItineraryOnMap(event.detail.polyline);
+    const { polylineFoot1, polylineFoot2, polylineBike } = event.detail;
+    displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike);
+});
+
+function displayHubsOnMap(hub1, hub2) {
+    if (hub1) {
+        const hub1Marker = L.marker([hub1.Latitude, hub1.Longitude], {
+            icon: L.icon({
+                iconUrl: "img/hub.svg",
+                iconSize: [40, 55],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+            }),
+        })
+            .addTo(map)
+            .bindPopup("Hub 1");
+        hub1Marker.openPopup();
+    }
+
+    if (hub2) {
+        const hub2Marker = L.marker([hub2.Latitude, hub2.Longitude], {
+            icon: L.icon({
+                iconUrl: "img/hub.svg",
+                iconSize: [40, 55],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+            }),
+        })
+            .addTo(map)
+            .bindPopup("Hub 2");
+        hub2Marker.openPopup();
+    }
+}
+
+window.addEventListener("showHubs", (event) => {
+    const { hub1, hub2 } = event.detail;
+    console.log(hub1, hub2);
+    console.log("showHubs");
+    
+    
+    displayHubsOnMap(hub1, hub2);
 });
 
 window.addEventListener("stopNavigation", (event) => {
