@@ -31,14 +31,26 @@ class LocationComponent extends HTMLElement {
         }
     }
 
+    debounce(func, delay) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
     addEventListeners() {
         const departureInput = this.shadowRoot.getElementById("departure");
         const arrivalInput = this.shadowRoot.getElementById("arrival");
         const startNavigationButton =
             this.shadowRoot.getElementById("start-navigation");
+        // Utilisation du debounce
+        const debouncedAutocomplete = this.debounce((value, inputId) => {
+            this.autocomplete(value, inputId);
+        }, 500);
 
         departureInput.addEventListener("input", (event) => {
-            this.autocomplete(event.target.value, "departure");
+            debouncedAutocomplete(event.target.value, "departure");
         });
         departureInput.addEventListener("click", (event) => {
             this.autocomplete(event.target.value, "departure");
@@ -47,13 +59,15 @@ class LocationComponent extends HTMLElement {
             const dropdown =
                 this.shadowRoot.getElementById("departure-dropdown");
             setTimeout(() => {
-                dropdown.innerHTML = "";
+                if (dropdown) {
+                    dropdown.innerHTML = "";
+                }
                 dropdown.remove();
             });
         });
 
         arrivalInput.addEventListener("input", (event) => {
-            this.autocomplete(event.target.value, "arrival");
+            debouncedAutocomplete(event.target.value, "arrival");
         });
         arrivalInput.addEventListener("click", (event) => {
             this.autocomplete(event.target.value, "arrival");
@@ -159,8 +173,10 @@ class LocationComponent extends HTMLElement {
                     window.dispatchEvent(
                         new CustomEvent("showHubs", {
                             detail: {
-                                hub1: data.GetItineraryResult.Details.StartStation,
-                                hub2: data.GetItineraryResult.Details.EndStation,
+                                hub1: data.GetItineraryResult.Details
+                                    .StartStation,
+                                hub2: data.GetItineraryResult.Details
+                                    .EndStation,
                             },
                         })
                     );
