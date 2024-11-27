@@ -67,8 +67,6 @@ class LocationComponent extends HTMLElement {
         });
 
         startNavigationButton.addEventListener("click", () => {
-            console.log("Start navigation button clicked");
-            console.log(this.chosenLocation);
             const departure = this.shadowRoot.getElementById("departure").value;
             const departureLat = this.chosenLocation.departureLat;
             const departureLon = this.chosenLocation.departureLon;
@@ -119,6 +117,8 @@ class LocationComponent extends HTMLElement {
         arrivalLon,
         city
     ) {
+        console.log("Lancement de la navigation");
+
         const apiClient = new ApiClient("http://localhost:8081");
         apiClient
             .getItinerary(
@@ -141,6 +141,31 @@ class LocationComponent extends HTMLElement {
                     })
                 );
                 window.dispatchEvent(
+                    new CustomEvent("drawItinerary", {
+                        detail: {
+                            polylineFoot1:
+                                data.GetItineraryResult.Route.Routes[0]
+                                    .GeometryFoot1,
+                            polylineFoot2:
+                                data.GetItineraryResult.Route.Routes[0]
+                                    .GeometryFoot2,
+                            polylineBike:
+                                data.GetItineraryResult.Route.Routes[0]
+                                    .GeometryBike,
+                        },
+                    })
+                );
+                if (data.GetItineraryResult.Details.StartStation) {
+                    window.dispatchEvent(
+                        new CustomEvent("showHubs", {
+                            detail: {
+                                hub1: data.GetItineraryResult.Details.StartStation,
+                                hub2: data.GetItineraryResult.Details.EndStation,
+                            },
+                        })
+                    );
+                }
+                window.dispatchEvent(
                     new CustomEvent("displayInstructionComponent")
                 );
             })
@@ -148,7 +173,7 @@ class LocationComponent extends HTMLElement {
                 console.error("Erreur:", error);
             });
     }
-    
+
     async autocomplete(query, inputId) {
         const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
             query
@@ -173,8 +198,6 @@ class LocationComponent extends HTMLElement {
     }
 
     showSuggestions(suggestions, inputId) {
-        console.log(suggestions);
-
         const inputElement = this.shadowRoot.getElementById(inputId);
         const dropdownId = `${inputId}-dropdown`;
 
@@ -210,15 +233,15 @@ class LocationComponent extends HTMLElement {
                 const [lon, lat] = suggestion.geometry.coordinates;
                 this.chosenLocation[`${inputId}Lat`] = lat;
                 this.chosenLocation[`${inputId}Lon`] = lon;
-                this.chosenLocation[`city`] = suggestion.properties.city.toLowerCase();
-                console.log(this.chosenLocation);
+                this.chosenLocation[`city`] =
+                    suggestion.properties.city.toLowerCase();
                 this.centerMapOnLocation(lat, lon);
+                this.addMarkerOnMap(lat, lon, inputId);
             });
             dropdown.appendChild(suggestionItem);
         });
         dropdown.scrollTop = dropdown.offsetHeight;
         if (suggestions.length > 0) {
-            console.log("suggestions not empty");
             return;
         }
         const mapOption = document.createElement("div");
@@ -277,6 +300,11 @@ class LocationComponent extends HTMLElement {
     centerMapOnLocation(lat, lon) {
         window.dispatchEvent(
             new CustomEvent("centerMap", { detail: { lat, lon } })
+        );
+    }
+    addMarkerOnMap(lat, lon, inputId) {
+        window.dispatchEvent(
+            new CustomEvent("addMarker", { detail: { lat, lon, inputId } })
         );
     }
 }

@@ -1,3 +1,5 @@
+import { MessageClient } from "./message-client.js";
+
 export class ApiClient {
     apiClientInstance = null;
 
@@ -27,8 +29,16 @@ export class ApiClient {
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
+            // parse the response
+            const data = await response.json();            
+            const userId =  data.GetItineraryResult.UserId;
+            console.log("userId", userId);
+            
+            const brokerUrl = "ws://localhost:61614/stomp"; // URL du broker ActiveMQ
 
-            const data = await response.json();
+            const messageClient = new MessageClient(brokerUrl, userId);
+            messageClient.connect();
+
             return data;
         } catch (error) {
             console.error("Erreur lors de l’appel API:", error);
@@ -36,15 +46,3 @@ export class ApiClient {
         }
     }
 }
-
-// apiClient.getItinerary(
-//     43.59965517690049,
-//     1.4408472084544073,
-//     43.60011368530669,
-//     1.44258404541932,
-//     'vitesse'
-// ).then(data => {
-//     console.log('Données reçues:', data);
-// }).catch(error => {
-//     console.error('Erreur:', error);
-// });
