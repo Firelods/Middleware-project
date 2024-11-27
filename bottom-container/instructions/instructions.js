@@ -91,7 +91,7 @@ class InstructionsComponent extends HTMLElement {
 
     updateDirectionIcon(direction) {
         const directionIcon = this.shadowRoot.getElementById("direction-icon");
-    
+
         // Correspondance entre les types numériques et les noms des fichiers SVG
         const directionMap = {
             0: "left",
@@ -109,14 +109,14 @@ class InstructionsComponent extends HTMLElement {
             12: "keep-left",
             13: "keep-right"
         };
-    
+
         // Récupération du nom du fichier SVG correspondant
         const svgName = directionMap[parseInt(direction)] || "default"; // Utilisation de "default" si le type est inconnu
-    
+
         // Mise à jour de l'icône
         directionIcon.src = `img/directions-icon/${svgName}.svg`;
     }
-    
+
 
     updateDirectionInstructions(instructions) {
         const directionInstructions = this.shadowRoot.getElementById("instruction");

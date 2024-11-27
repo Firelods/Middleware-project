@@ -44,11 +44,11 @@
 }
 
 #departure-dropdown {
-    bottom: 30%;
+    bottom: 22vh;
 }
 
 #arrival-dropdown {
-    bottom: 20%;
+    bottom: 13vh;
 }
 
 .autocomplete-item {
