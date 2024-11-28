@@ -31,8 +31,15 @@ window.addEventListener("addMarker", (event) => {
 });
 
 window.addEventListener("centerMap", (event) => {
-    const { lat, lon } = event.detail;
-    centerMap(lat, lon); // Recentrer la carte sur la position de l'utilisateur
+    console.log("Centering map with details:", event.detail);
+    const { lat, lon, zoom } = event.detail;
+
+    // Utiliser setView pour recentrer et ajuster le zoom en un seul appel
+    if (lat && lon) {
+        map.setView([lat, lon], zoom || map.getZoom());
+    } else {
+        console.error("Invalid coordinates provided for centering the map.");
+    }
 });
 
 window.addEventListener("displayInstructionComponent", (event) => {
@@ -78,9 +85,15 @@ function showCustomNotification(title, message, type) {
 
 let currentPolylines = []; // Liste pour gérer toutes les polylignes
 
+function hideItineraryOnMap() {
+    if (currentPolylines && currentPolylines.length > 0) {
+        currentPolylines.forEach((polyline) => polyline.remove());
+    }
+}
+
 function displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike) {
     // Supprimez les anciennes polylignes
-    currentPolylines.forEach((polyline) => polyline.remove());
+    hideItineraryOnMap();
     currentPolylines = [];
 
     // Ajouter la polyligne en vélo (ligne continue)
@@ -102,7 +115,7 @@ function displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike) {
         const footPolyline1 = L.polyline(
             decodedFoot1.map(([lat, lng]) => [lat, lng]),
             {
-                color: "green",
+                color: "cyan",
                 weight: 5,
                 dashArray: "10, 10", // Pointillé
             }
@@ -115,7 +128,7 @@ function displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike) {
         const footPolyline2 = L.polyline(
             decodedFoot2.map(([lat, lng]) => [lat, lng]),
             {
-                color: "green",
+                color: "cyan",
                 weight: 5,
                 dashArray: "10, 10", // Pointillé
             }
@@ -179,9 +192,3 @@ window.addEventListener("showHubs", (event) => {
 window.addEventListener("stopNavigation", (event) => {
     hideItineraryOnMap();
 });
-
-function hideItineraryOnMap() {
-    if (currentPolyline) {
-        currentPolyline.remove();
-    }
-}

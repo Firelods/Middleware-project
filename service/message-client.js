@@ -74,6 +74,7 @@ export class MessageClient {
                         direction: message.Type,
                         distance: message.Distance,
                         duration: message.Duration,
+                        coordinates: {lat: message.Coordinates.Latitude, lng: message.Coordinates.Longitude}
                     },
                 })
             );

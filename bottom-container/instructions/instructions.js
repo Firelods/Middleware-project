@@ -58,14 +58,25 @@ class InstructionsComponent extends HTMLElement {
     listenForNewInstructions() {
         // Écoute des nouvelles instructions depuis les événements globaux
         window.addEventListener("newInstruction", (event) => {
-            const { instruction, direction, distance, duration } = event.detail;
+            const { instruction, direction, distance, duration, coordinates } =
+                event.detail;
 
             this.updateDirectionInstructions(instruction);
             this.updateDirectionIcon(direction);
             this.updateArrivalTimeFromDuration(duration);
+            const zoom = this.calculateZoomBasedOnDistance(distance);
+            this.centerMapOnLocation(coordinates.lat, coordinates.lng, zoom);
 
             console.log(`Instruction mise à jour : ${instruction}`);
         });
+    }
+
+    calculateZoomBasedOnDistance(distance) {
+        if (distance < 150) {
+            return 17; 
+        } else {
+            return 16;
+        } 
     }
 
     updateArrivalTimeFromDuration(duration) {
@@ -78,6 +89,12 @@ class InstructionsComponent extends HTMLElement {
         this.updateArrivalTime(
             arrivalDate.getHours(),
             arrivalDate.getMinutes()
+        );
+    }
+
+    centerMapOnLocation(lat, lon, zoom) {
+        window.dispatchEvent(
+            new CustomEvent("centerMap", { detail: { lat, lon, zoom } })
         );
     }
 
@@ -116,7 +133,6 @@ class InstructionsComponent extends HTMLElement {
         // Mise à jour de l'icône
         directionIcon.src = `img/directions-icon/${svgName}.svg`;
     }
-
 
     updateDirectionInstructions(instructions) {
         const directionInstructions = this.shadowRoot.getElementById("instruction");
