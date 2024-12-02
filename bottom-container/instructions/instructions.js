@@ -58,14 +58,39 @@ class InstructionsComponent extends HTMLElement {
     listenForNewInstructions() {
         // Écoute des nouvelles instructions depuis les événements globaux
         window.addEventListener("newInstruction", (event) => {
-            const { instruction, direction, distance, duration } = event.detail;
+            const {
+                instruction,
+                direction,
+                distance,
+                duration,
+                coordinates,
+                bearing,
+            } = event.detail;
 
             this.updateDirectionInstructions(instruction);
             this.updateDirectionIcon(direction);
             this.updateArrivalTimeFromDuration(duration);
+            const zoom = this.calculateZoomBasedOnDistance(distance);
+            this.updateMap(coordinates.lat, coordinates.lng, zoom, bearing);
 
             console.log(`Instruction mise à jour : ${instruction}`);
         });
+    }
+
+    updateMap(lat, lon, zoom, bearing) {
+        window.dispatchEvent(
+            new CustomEvent("updateMap", {
+                detail: { lat, lon, zoom, bearing },
+            })
+        );
+    }
+
+    calculateZoomBasedOnDistance(distance) {
+        if (distance < 70) {
+            return 18;
+        } else {
+            return 17;
+        }
     }
 
     updateArrivalTimeFromDuration(duration) {
@@ -78,6 +103,12 @@ class InstructionsComponent extends HTMLElement {
         this.updateArrivalTime(
             arrivalDate.getHours(),
             arrivalDate.getMinutes()
+        );
+    }
+
+    centerMapOnLocation(lat, lon, zoom) {
+        window.dispatchEvent(
+            new CustomEvent("centerMap", { detail: { lat, lon, zoom } })
         );
     }
 
@@ -116,7 +147,6 @@ class InstructionsComponent extends HTMLElement {
         // Mise à jour de l'icône
         directionIcon.src = `img/directions-icon/${svgName}.svg`;
     }
-
 
     updateDirectionInstructions(instructions) {
         const directionInstructions = this.shadowRoot.getElementById("instruction");
