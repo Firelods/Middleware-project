@@ -30,7 +30,6 @@ window.addEventListener("addMarker", (event) => {
     }
 });
 
-<<<<<<< HEAD
 window.addEventListener("updateMap", (event) => {
     const { lat, lon, zoom, bearing } = event.detail;
     // Utiliser setView pour recentrer et ajuster le zoom en un seul appel
@@ -42,7 +41,7 @@ window.addEventListener("updateMap", (event) => {
     }
     console.log("Rotating map to bearing:", bearing);
     // smoothRotateMap(-bearing);
-    smoothRotateMap(360-bearing);
+    smoothRotateMap(360 - bearing);
 });
 
 function smoothRotateMap(targetBearing) {
@@ -53,7 +52,6 @@ function smoothRotateMap(targetBearing) {
     let delta = targetBearing - currentBearing;
     if (delta > 180) delta -= 360; // Si l'écart est supérieur à 180°, prend le sens inverse
     if (delta < -180) delta += 360; // Si l'écart est inférieur à -180°, prend le sens inverse
-
 
     // Fonction de Bézier cubique pour une interpolation douce (ease-in-out)
     function cubicBezier(t, p0, p1, p2, p3) {
@@ -81,8 +79,7 @@ function smoothRotateMap(targetBearing) {
         const easedProgress = cubicBezier(t, p0, p1, p2, p3);
 
         // Interpolation de la rotation
-        const interpolatedBearing =
-            currentBearing + delta * easedProgress;
+        const interpolatedBearing = currentBearing + delta * easedProgress;
 
         map.setBearing(interpolatedBearing); // Met à jour la rotation
 
@@ -96,7 +93,6 @@ function smoothRotateMap(targetBearing) {
     requestAnimationFrame(animate); // Lance l'animation
 }
 
-=======
 map.on("click", (event) => {
     const lat = event.latlng.lat;
     const lon = event.latlng.lng;
@@ -107,7 +103,6 @@ map.on("click", (event) => {
     );
 });
 
->>>>>>> 677ac76 (✨ add click point on map functionality)
 window.addEventListener("centerMap", (event) => {
     console.log("Centering map with details:", event.detail);
     const { lat, lon, zoom } = event.detail;
@@ -174,7 +169,6 @@ function displayItineraryOnMap(footPolylines = [], bikePolylines = []) {
     hideItineraryOnMap();
     currentPolylines = [];
 
-    
     // Ajouter les polylignes en vélo (ligne continue)
     bikePolylines.forEach((polylineData) => {
         const decodedBike = polyline.decode(polylineData);
@@ -215,9 +209,31 @@ function displayItineraryOnMap(footPolylines = [], bikePolylines = []) {
     }
 }
 
-window.addEventListener("drawItinerary", (event) => {
+window.addEventListener("drawItineraryCombined", (event) => {
     const { polylineFoot1, polylineFoot2, polylineBike } = event.detail;
-    displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike);
+    displayItineraryOnMap(
+        [polylineFoot1, polylineFoot2].filter(Boolean), // Filtrer les null ou undefined
+        [polylineBike].filter(Boolean)
+    );
+});
+
+window.addEventListener("drawItineraryInterCity", (event) => {
+    const {
+        polylineFoot1,
+        polylineFoot2,
+        polylineFoot3,
+        polylineBike1,
+        polylineBike2,
+    } = event.detail;
+    displayItineraryOnMap(
+        [polylineFoot1, polylineFoot2, polylineFoot3].filter(Boolean),
+        [polylineBike1, polylineBike2].filter(Boolean)
+    );
+});
+
+window.addEventListener("drawItineraryDirect", (event) => {
+    const { polylineFoot } = event.detail;
+    displayItineraryOnMap([polylineFoot], []);
 });
 
 function displayHubsOnMap(hub1, hub2) {
