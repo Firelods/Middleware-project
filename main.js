@@ -30,6 +30,16 @@ window.addEventListener("addMarker", (event) => {
     }
 });
 
+map.on("click", (event) => {
+    const lat = event.latlng.lat;
+    const lon = event.latlng.lng;
+    window.dispatchEvent(
+        new CustomEvent("mapClicked", {
+            detail: { lat, lon },
+        })
+    );
+});
+
 window.addEventListener("updateMap", (event) => {
     const { lat, lon, zoom, bearing } = event.detail;
     // Utiliser setView pour recentrer et ajuster le zoom en un seul appel

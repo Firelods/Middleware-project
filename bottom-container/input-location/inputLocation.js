@@ -88,7 +88,8 @@ class LocationComponent extends HTMLElement {
             const arrivalLat = this.chosenLocation.arrivalLat;
             const arrivalLon = this.chosenLocation.arrivalLon;
             const city = this.chosenLocation.city;
-
+            console.log(departure, arrival, departureLat, departureLon, arrivalLat, arrivalLon, city);
+            
             if (
                 departure &&
                 arrival &&
@@ -108,6 +109,9 @@ class LocationComponent extends HTMLElement {
                     city
                 );
             } else {
+                console.log("Erreur : adresses non valides");
+                
+                
                 window.dispatchEvent(
                     new CustomEvent("displayNotif", {
                         detail: {
@@ -263,6 +267,20 @@ class LocationComponent extends HTMLElement {
         const mapOption = document.createElement("div");
         mapOption.className = "autocomplete-item map-icon";
         mapOption.textContent = "Pick point on map";
+        const mapClickHandler = (event) => {
+            const { lat, lon } = event.detail;
+            this.chosenLocation[`${inputId}Lat`] = lat;
+            this.chosenLocation[`${inputId}Lon`] = lon;
+            this.addMarkerOnMap(lat, lon, inputId);
+            this.centerMapOnLocation(lat, lon);
+            window.removeEventListener("mapClicked", mapClickHandler);
+        };
+        mapOption.addEventListener("click", () => {
+            inputElement.value = "Pick point on map";
+            dropdown.innerHTML = "";
+            dropdown.remove();
+            window.addEventListener("mapClicked", mapClickHandler);
+        });
         dropdown.appendChild(mapOption);
 
         const locationOption = document.createElement("div");
