@@ -1,4 +1,4 @@
-var map = L.map("map").setView([48.8566, 2.3522], 13);
+var map = L.map("map", { rotate: true }).setView([48.8566, 2.3522], 13);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution:
@@ -29,6 +29,71 @@ window.addEventListener("addMarker", (event) => {
         console.error("inputId not found when adding marker");
     }
 });
+
+window.addEventListener("updateMap", (event) => {
+    const { lat, lon, zoom, bearing } = event.detail;
+    // Utiliser setView pour recentrer et ajuster le zoom en un seul appel
+    console.log("Centering map with details:", event.detail);
+    if (lat && lon) {
+        map.setView([lat, lon], zoom || map.getZoom());
+    } else {
+        console.error("Invalid coordinates provided for centering the map.");
+    }
+    console.log("Rotating map to bearing:", bearing);
+    // smoothRotateMap(-bearing);
+    smoothRotateMap(360-bearing);
+});
+
+function smoothRotateMap(targetBearing) {
+    const currentBearing = map.getBearing(); // Angle initial de la carte
+    const totalSteps = 60; // Durée totale de l'animation en frames (~1 seconde si 60fps)
+    let step = 0;
+
+    let delta = targetBearing - currentBearing;
+    if (delta > 180) delta -= 360; // Si l'écart est supérieur à 180°, prend le sens inverse
+    if (delta < -180) delta += 360; // Si l'écart est inférieur à -180°, prend le sens inverse
+
+
+    // Fonction de Bézier cubique pour une interpolation douce (ease-in-out)
+    function cubicBezier(t, p0, p1, p2, p3) {
+        return (
+            Math.pow(1 - t, 3) * p0 +
+            3 * Math.pow(1 - t, 2) * t * p1 +
+            3 * (1 - t) * Math.pow(t, 2) * p2 +
+            Math.pow(t, 3) * p3
+        );
+    }
+
+    // Points de contrôle pour une transition douce (ease-in-out)
+    const p0 = 0; // Départ
+    const p1 = 0.25; // Accélération initiale
+    const p2 = 0.75; // Décélération finale
+    const p3 = 1; // Arrivée
+
+    function animate() {
+        step++;
+
+        // Fraction de progression normalisée (de 0 à 1)
+        const t = step / totalSteps;
+
+        // Appliquer la courbe de Bézier pour ajuster la progression
+        const easedProgress = cubicBezier(t, p0, p1, p2, p3);
+
+        // Interpolation de la rotation
+        const interpolatedBearing =
+            currentBearing + delta * easedProgress;
+
+        map.setBearing(interpolatedBearing); // Met à jour la rotation
+
+        if (step < totalSteps) {
+            requestAnimationFrame(animate); // Continue l'animation
+        } else {
+            map.setBearing(targetBearing); // Assure la position finale exacte
+        }
+    }
+
+    requestAnimationFrame(animate); // Lance l'animation
+}
 
 window.addEventListener("centerMap", (event) => {
     console.log("Centering map with details:", event.detail);

@@ -33,7 +33,7 @@ export class MessageClient {
             console.error("Détails:", frame.body);
         };
         this.handleUpdateRequest();
-        this.stompClient.activate(); 
+        this.stompClient.activate();
     }
 
 
@@ -74,7 +74,11 @@ export class MessageClient {
                         direction: message.Type,
                         distance: message.Distance,
                         duration: message.Duration,
-                        coordinates: {lat: message.Coordinates.Latitude, lng: message.Coordinates.Longitude}
+                        coordinates: {
+                            lat: message.Maneuver.Location[1],
+                            lng: message.Maneuver.Location[0],
+                        },
+                        bearing: message.Maneuver.bearing_before,
                     },
                 })
             );

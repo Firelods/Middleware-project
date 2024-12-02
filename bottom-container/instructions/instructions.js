@@ -58,25 +58,39 @@ class InstructionsComponent extends HTMLElement {
     listenForNewInstructions() {
         // Écoute des nouvelles instructions depuis les événements globaux
         window.addEventListener("newInstruction", (event) => {
-            const { instruction, direction, distance, duration, coordinates } =
-                event.detail;
+            const {
+                instruction,
+                direction,
+                distance,
+                duration,
+                coordinates,
+                bearing,
+            } = event.detail;
 
             this.updateDirectionInstructions(instruction);
             this.updateDirectionIcon(direction);
             this.updateArrivalTimeFromDuration(duration);
             const zoom = this.calculateZoomBasedOnDistance(distance);
-            this.centerMapOnLocation(coordinates.lat, coordinates.lng, zoom);
+            this.updateMap(coordinates.lat, coordinates.lng, zoom, bearing);
 
             console.log(`Instruction mise à jour : ${instruction}`);
         });
     }
 
+    updateMap(lat, lon, zoom, bearing) {
+        window.dispatchEvent(
+            new CustomEvent("updateMap", {
+                detail: { lat, lon, zoom, bearing },
+            })
+        );
+    }
+
     calculateZoomBasedOnDistance(distance) {
-        if (distance < 150) {
-            return 17; 
+        if (distance < 70) {
+            return 18;
         } else {
-            return 16;
-        } 
+            return 17;
+        }
     }
 
     updateArrivalTimeFromDuration(duration) {
