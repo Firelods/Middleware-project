@@ -87,9 +87,19 @@ class LocationComponent extends HTMLElement {
             const arrival = this.shadowRoot.getElementById("arrival").value;
             const arrivalLat = this.chosenLocation.arrivalLat;
             const arrivalLon = this.chosenLocation.arrivalLon;
-            const city = this.chosenLocation.city;
-            console.log(departure, arrival, departureLat, departureLon, arrivalLat, arrivalLon, city);
-            
+            const departureCity = this.chosenLocation.departureCity;
+            const arrivalCity = this.chosenLocation.arrivalCity;
+            console.log(
+                departure,
+                arrival,
+                departureLat,
+                departureLon,
+                arrivalLat,
+                arrivalLon,
+                departureCity,
+                arrivalCity
+            );
+
             if (
                 departure &&
                 arrival &&
@@ -97,7 +107,8 @@ class LocationComponent extends HTMLElement {
                 departureLon &&
                 arrivalLat &&
                 arrivalLon &&
-                city
+                departureCity &&
+                arrivalCity
             ) {
                 this.startItinerary(
                     departure,
@@ -106,12 +117,12 @@ class LocationComponent extends HTMLElement {
                     departureLon,
                     arrivalLat,
                     arrivalLon,
-                    city
+                    departureCity,
+                    arrivalCity
                 );
             } else {
                 console.log("Erreur : adresses non valides");
-                
-                
+
                 window.dispatchEvent(
                     new CustomEvent("displayNotif", {
                         detail: {
@@ -133,7 +144,8 @@ class LocationComponent extends HTMLElement {
         departureLon,
         arrivalLat,
         arrivalLon,
-        city
+        departureCity,
+        arrivalCity
     ) {
         console.log("Lancement de la navigation");
 
@@ -145,7 +157,8 @@ class LocationComponent extends HTMLElement {
                 arrivalLat,
                 arrivalLon,
                 "vitesse",
-                city
+                departureCity,
+                arrivalCity
             )
             .then((data) => {
                 console.log("Données reçues:", data);
@@ -158,21 +171,60 @@ class LocationComponent extends HTMLElement {
                         },
                     })
                 );
-                window.dispatchEvent(
-                    new CustomEvent("drawItinerary", {
-                        detail: {
-                            polylineFoot1:
-                                data.GetItineraryResult.Route.Routes[0]
-                                    .GeometryFoot1,
-                            polylineFoot2:
-                                data.GetItineraryResult.Route.Routes[0]
-                                    .GeometryFoot2,
-                            polylineBike:
-                                data.GetItineraryResult.Route.Routes[0]
-                                    .GeometryBike,
-                        },
-                    })
-                );
+                switch (data.GetItineraryResult.Type) {
+                    case "InterCityRoute":
+                        window.dispatchEvent(
+                            new CustomEvent("drawItineraryInterCity", {
+                                detail: {
+                                    polylineFoot1:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryFoot1,
+                                    polylineFoot2:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryFoot2,
+                                    polylineFoot3:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryFoot3,
+                                    polylineBike1:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryBike1,
+                                    polylineBike2:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryBike2,
+                                },
+                            })
+                        );
+                        break;
+                    case "CombinedRoute":
+                        window.dispatchEvent(
+                            new CustomEvent("drawItineraryCombined", {
+                                detail: {
+                                    polylineFoot1:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryFoot1,
+                                    polylineFoot2:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryFoot2,
+                                    polylineBike:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .GeometryBike,
+                                },
+                            })
+                        );
+                        break;
+                    case "DirectRoute":
+                        window.dispatchEvent(
+                            new CustomEvent("drawItineraryDirect", {
+                                detail: {
+                                    polylineFoot:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .Geometry,
+                                },
+                            })
+                        );
+                        break;
+                }
+
                 if (data.GetItineraryResult.Details.StartStation) {
                     window.dispatchEvent(
                         new CustomEvent("showHubs", {
@@ -185,6 +237,7 @@ class LocationComponent extends HTMLElement {
                         })
                     );
                 }
+
                 window.dispatchEvent(
                     new CustomEvent("displayInstructionComponent")
                 );
@@ -253,7 +306,7 @@ class LocationComponent extends HTMLElement {
                 const [lon, lat] = suggestion.geometry.coordinates;
                 this.chosenLocation[`${inputId}Lat`] = lat;
                 this.chosenLocation[`${inputId}Lon`] = lon;
-                this.chosenLocation[`city`] =
+                this.chosenLocation[`${inputId}City`] =
                     suggestion.properties.city.toLowerCase();
                 this.centerMapOnLocation(lat, lon);
                 this.addMarkerOnMap(lat, lon, inputId);
@@ -267,12 +320,26 @@ class LocationComponent extends HTMLElement {
         const mapOption = document.createElement("div");
         mapOption.className = "autocomplete-item map-icon";
         mapOption.textContent = "Pick point on map";
-        const mapClickHandler = (event) => {
+        const mapClickHandler = async (event) => {
             const { lat, lon } = event.detail;
             this.chosenLocation[`${inputId}Lat`] = lat;
             this.chosenLocation[`${inputId}Lon`] = lon;
             this.addMarkerOnMap(lat, lon, inputId);
             this.centerMapOnLocation(lat, lon);
+            // Requête à l'API d'adresse pour récupérer la ville
+            try {
+                const response = await fetch(
+                    `https://api-adresse.data.gouv.fr/reverse/?lon=${lon}&lat=${lat}`
+                );
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                const data = await response.json();
+                this.chosenLocation[`${inputId}City`] =
+                    data.features[0].properties.city; // Assurez-vous que la réponse contient la ville sous la clé 'city'
+            } catch (error) {
+                console.error("Error fetching address:", error);
+            }
             window.removeEventListener("mapClicked", mapClickHandler);
         };
         mapOption.addEventListener("click", () => {

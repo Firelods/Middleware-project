@@ -14,8 +14,16 @@ export class ApiClient {
         return this.apiClientInstance;
     }
 
-    async getItinerary(originLat, originLng, destLat, destLng, priority, city) {
-        const url = `${this.baseURL}/itinerary/GetItinerary?originLat=${originLat}&originLng=${originLng}&destLat=${destLat}&destLng=${destLng}&priority=${priority}&contract=${city}`;
+    async getItinerary(
+        originLat,
+        originLng,
+        destLat,
+        destLng,
+        priority,
+        departureCity,
+        arrivalCity
+    ) {
+        const url = `${this.baseURL}/itinerary/GetItinerary?originLat=${originLat}&originLng=${originLng}&destLat=${destLat}&destLng=${destLng}&priority=${priority}&departureContract=${departureCity}&arrivalContract=${arrivalCity}`;
 
         try {
             const response = await fetch(url, {
@@ -30,10 +38,10 @@ export class ApiClient {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
             // parse the response
-            const data = await response.json();            
-            const userId =  data.GetItineraryResult.UserId;
+            const data = await response.json();
+            const userId = data.GetItineraryResult.UserId;
             console.log("userId", userId);
-            
+
             const brokerUrl = "ws://localhost:61614/stomp"; // URL du broker ActiveMQ
 
             const messageClient = new MessageClient(brokerUrl, userId);

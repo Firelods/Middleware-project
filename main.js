@@ -30,16 +30,7 @@ window.addEventListener("addMarker", (event) => {
     }
 });
 
-map.on("click", (event) => {
-    const lat = event.latlng.lat;
-    const lon = event.latlng.lng;
-    window.dispatchEvent(
-        new CustomEvent("mapClicked", {
-            detail: { lat, lon },
-        })
-    );
-});
-
+<<<<<<< HEAD
 window.addEventListener("updateMap", (event) => {
     const { lat, lon, zoom, bearing } = event.detail;
     // Utiliser setView pour recentrer et ajuster le zoom en un seul appel
@@ -105,6 +96,18 @@ function smoothRotateMap(targetBearing) {
     requestAnimationFrame(animate); // Lance l'animation
 }
 
+=======
+map.on("click", (event) => {
+    const lat = event.latlng.lat;
+    const lon = event.latlng.lng;
+    window.dispatchEvent(
+        new CustomEvent("mapClicked", {
+            detail: { lat, lon },
+        })
+    );
+});
+
+>>>>>>> 677ac76 (✨ add click point on map functionality)
 window.addEventListener("centerMap", (event) => {
     console.log("Centering map with details:", event.detail);
     const { lat, lon, zoom } = event.detail;
@@ -166,14 +169,15 @@ function hideItineraryOnMap() {
     }
 }
 
-function displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike) {
+function displayItineraryOnMap(footPolylines = [], bikePolylines = []) {
     // Supprimez les anciennes polylignes
     hideItineraryOnMap();
     currentPolylines = [];
 
-    // Ajouter la polyligne en vélo (ligne continue)
-    if (polylineBike) {
-        const decodedBike = polyline.decode(polylineBike);
+    
+    // Ajouter les polylignes en vélo (ligne continue)
+    bikePolylines.forEach((polylineData) => {
+        const decodedBike = polyline.decode(polylineData);
         const bikePolyline = L.polyline(
             decodedBike.map(([lat, lng]) => [lat, lng]),
             {
@@ -182,34 +186,21 @@ function displayItineraryOnMap(polylineFoot1, polylineFoot2, polylineBike) {
             }
         ).addTo(map);
         currentPolylines.push(bikePolyline);
-    }
+    });
 
     // Ajouter les polylignes à pied (en pointillé)
-    if (polylineFoot1) {
-        const decodedFoot1 = polyline.decode(polylineFoot1);
-        const footPolyline1 = L.polyline(
-            decodedFoot1.map(([lat, lng]) => [lat, lng]),
+    footPolylines.forEach((polylineData) => {
+        const decodedFoot = polyline.decode(polylineData);
+        const footPolyline = L.polyline(
+            decodedFoot.map(([lat, lng]) => [lat, lng]),
             {
                 color: "cyan",
                 weight: 5,
                 dashArray: "10, 10", // Pointillé
             }
         ).addTo(map);
-        currentPolylines.push(footPolyline1);
-    }
-
-    if (polylineFoot2) {
-        const decodedFoot2 = polyline.decode(polylineFoot2);
-        const footPolyline2 = L.polyline(
-            decodedFoot2.map(([lat, lng]) => [lat, lng]),
-            {
-                color: "cyan",
-                weight: 5,
-                dashArray: "10, 10", // Pointillé
-            }
-        ).addTo(map);
-        currentPolylines.push(footPolyline2);
-    }
+        currentPolylines.push(footPolyline);
+    });
 
     if (currentPolylines.length > 0) {
         const allBounds = currentPolylines.map((polyline) =>
