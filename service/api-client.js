@@ -36,9 +36,8 @@ export class ApiClient {
             });
 
             if (!response.ok) {
-                // throw new Error(`HTTP error! Status: ${response.status}`); en francais
-                throw new Error(`HTTP ${response.status}`);
-            
+                const errorMessage = await response.text();
+                throw new Error(`HTTP ${response.status} : ${errorMessage}`);
             }
             // parse the response
             const data = await response.json();
@@ -53,15 +52,7 @@ export class ApiClient {
             return data;
         } catch (error) {
             console.error("Erreur lors de l'appel API:", error);
-            if (error.message.includes("Failed to fetch")) {
-                showCustomNotification(
-                    "Erreur de connexion",
-                    "Impossible de se connecter au serveur",
-                    "error"
-                );
-            } else {
-                showCustomNotification("Erreur du serveur ", error, "error");
-            }
+            showCustomNotification("Erreur du serveur ", error, "error");
             throw error;
         }
     }
