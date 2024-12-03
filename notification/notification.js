@@ -85,3 +85,11 @@ class NotificationComponent extends HTMLElement {
 }
 
 customElements.define("notification-component", NotificationComponent);
+
+export function showCustomNotification(title, message, type) {
+    // Récupération du composant de notification par son ID
+    const notificationComponent = document.getElementById("notification");
+
+    // Appel de la méthode pour afficher la notification avec le titre et le message personnalisé
+    notificationComponent.showNotification(title, message, type);
+}

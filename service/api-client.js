@@ -1,4 +1,5 @@
 import { MessageClient } from "./message-client.js";
+import { showCustomNotification } from "../notification/notification.js";
 
 export class ApiClient {
     apiClientInstance = null;
@@ -49,7 +50,16 @@ export class ApiClient {
 
             return data;
         } catch (error) {
-            console.error("Erreur lors de l’appel API:", error);
+            console.error("Erreur lors de l'appel API:", error);
+            if (error.message.includes("Failed to fetch")) {
+                showCustomNotification(
+                    "Erreur de connexion",
+                    "Impossible de se connecter au serveur",
+                    "error"
+                );
+            } else {
+                showCustomNotification("Erreur du serveur ", error, "error");
+            }
             throw error;
         }
     }

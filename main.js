@@ -1,3 +1,4 @@
+import { showCustomNotification } from "./notification/notification.js";
 var map = L.map("map", { rotate: true }).setView([48.8566, 2.3522], 13);
 
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -131,10 +132,6 @@ window.addEventListener("displayNotif", (event) => {
     showCustomNotification(title, message, type);
 });
 
-function centerMap(lat, lon) {
-    map.setView([lat, lon], 13);
-}
-
 function displayInputLocationComponent(display, reset = false) {
     const inputLocationComponent = document.getElementById(
         "inputLocationComponent"
@@ -150,14 +147,6 @@ function displayInstructionComponent(display) {
         "instructionComponent"
     );
     instructionComponent.style.display = display ? "block" : "none";
-}
-
-function showCustomNotification(title, message, type) {
-    // Récupération du composant de notification par son ID
-    const notificationComponent = document.getElementById("notification");
-
-    // Appel de la méthode pour afficher la notification avec le titre et le message personnalisé
-    notificationComponent.showNotification(title, message, type);
 }
 
 let currentPolylines = []; // Liste pour gérer toutes les polylignes

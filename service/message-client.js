@@ -1,3 +1,5 @@
+import { showCustomNotification } from "../notification/notification.js";
+
 export class MessageClient {
     constructor(brokerUrl, userId) {
         this.brokerUrl = brokerUrl; // URL WebSocket du broker
@@ -24,48 +26,71 @@ export class MessageClient {
         // Connecter au broker
         this.stompClient.onConnect = () => {
             console.log("Connecté au broker ActiveMQ.");
-            this.subscribeToQueue("/queue/itinerary-updates."+this.userId); // S'abonner à la queue spécifiée
+            this.subscribeToQueue("/queue/itinerary-updates." + this.userId); // S'abonner à la queue spécifiée
         };
 
         // Gestion des erreurs
         this.stompClient.onStompError = (frame) => {
             console.error("Erreur Stomp:", frame.headers["message"]);
             console.error("Détails:", frame.body);
+            showCustomNotification(
+                "Erreur Stomp",
+                frame.headers["message"],
+                "error"
+            );
         };
         this.handleUpdateRequest();
         this.stompClient.activate();
     }
 
+    /**
+     * Send a request to the server to get the next instruction
+     */
+    sendUpdateRequest() {
+        this.stompClient.publish({
+            destination: "/queue/request-updates." + this.userId,
+            body: JSON.stringify({
+                UserId: this.userId,
+                type: "update",
+            }),
+        });
+        this.startMessageTimeout();
+    }
 
     // S'abonner à une queue ActiveMQ
     subscribeToQueue(queueName) {
         this.stompClient.subscribe(queueName, (message) => {
             console.log("Message reçu:", message.body);
+            clearTimeout(this.messageTimeout);
             this.handleMessage(JSON.parse(message.body));
         });
     }
 
+    /**
+     * Start a timeout to show a notification if the server does not respond within 5 seconds
+     */
+    startMessageTimeout() {
+        this.messageTimeout = setTimeout(() => {
+            showCustomNotification(
+                "Erreur de connexion",
+                "Le serveur ne répond pas. Veuillez réessayer plus tard.",
+                "error"
+            );
+        }, 5000);
+    }
+
+    /**
+     * Handle the request for the next instruction
+     */
     handleUpdateRequest() {
         window.addEventListener("requestNextInstruction", (event) => {
             this.sendUpdateRequest();
         });
     }
 
-    sendUpdateRequest() {
-        this.stompClient.publish({
-            destination: "/queue/request-updates."+this.userId,
-            body: JSON.stringify({
-                UserId: this.userId,
-                type:"update",
-            }),
-        });
-    }
-
     // Gérer les messages reçus
     handleMessage(message) {
-
         if (message.UserId === this.userId && message.type != "update") {
-
             // Émettre un événement global avec les détails de l'instruction
             window.dispatchEvent(
                 new CustomEvent("newInstruction", {
@@ -75,11 +100,15 @@ export class MessageClient {
                         distance: message.Distance,
                         duration: message.Duration,
                         coordinates: {
-                            lat: message.Maneuver.Location ? message.Maneuver.Location[1] : null,
-                            lng: message.Maneuver.Location ? message.Maneuver.Location[0] : null,
+                            lat: message.Maneuver.Location
+                                ? message.Maneuver.Location[1]
+                                : null,
+                            lng: message.Maneuver.Location
+                                ? message.Maneuver.Location[0]
+                                : null,
                         },
                         bearing: message.Maneuver.bearing_before,
-                        arrived: message.Arrived
+                        arrived: message.Arrived,
                     },
                 })
             );
