@@ -47,6 +47,7 @@ export class MessageClient {
      * Send a request to the server to get the next instruction
      */
     sendUpdateRequest() {
+        this.startMessageTimeout();
         this.stompClient.publish({
             destination: "/queue/request-updates." + this.userId,
             body: JSON.stringify({
@@ -54,7 +55,6 @@ export class MessageClient {
                 type: "update",
             }),
         });
-        this.startMessageTimeout();
     }
 
     // S'abonner à une queue ActiveMQ
@@ -76,6 +76,7 @@ export class MessageClient {
                 "Le serveur ne répond pas. Veuillez réessayer plus tard.",
                 "error"
             );
+            this.stompClient.deactivate();
         }, 5000);
     }
 
