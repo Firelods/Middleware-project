@@ -36,7 +36,9 @@ export class ApiClient {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                // throw new Error(`HTTP error! Status: ${response.status}`); en francais
+                throw new Error(`HTTP ${response.status}`);
+            
             }
             // parse the response
             const data = await response.json();
