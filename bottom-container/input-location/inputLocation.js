@@ -230,6 +230,21 @@ class LocationComponent extends HTMLElement {
                         );
                         break;
                 }
+                try{
+                    if (data.GetItineraryResult.Route.Routes[0].Summary){
+
+                        window.dispatchEvent(
+                            new CustomEvent("showDuration", {
+                                detail: {
+                                    duration: data.GetItineraryResult.Route.Routes[0].Summary.Duration,
+                                },
+                            })
+                        );
+                    }
+                }catch{
+                    console.log("No summary given")
+                }
+                
 
                 window.dispatchEvent(
                     new CustomEvent("displayInstructionComponent")
