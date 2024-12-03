@@ -26,7 +26,10 @@ export class MessageClient {
         // Connecter au broker
         this.stompClient.onConnect = () => {
             console.log("Connecté au broker ActiveMQ.");
-            this.subscribeToQueue("/queue/itinerary-updates." + this.userId); // S'abonner à la queue spécifiée
+            this.subscribeToItineraryQueue(
+                "/queue/itinerary-updates." + this.userId
+            ); // S'abonner à la queue spécifiée
+            this.subscribeToAlertQueue("/queue/trafic-alerts." + this.userId); // S'abonner à la queue spécifiée
         };
 
         // Gestion des erreurs
@@ -57,12 +60,20 @@ export class MessageClient {
         });
     }
 
-    // S'abonner à une queue ActiveMQ
-    subscribeToQueue(queueName) {
+    // S'abonner à la queue des itinéraires
+    subscribeToItineraryQueue(queueName) {
         this.stompClient.subscribe(queueName, (message) => {
-            console.log("Message reçu:", message.body);
+            console.log("Message d'itinéraire reçu:", message.body);
             clearTimeout(this.messageTimeout);
-            this.handleMessage(JSON.parse(message.body));
+            this.handleItineraryMessage(JSON.parse(message.body));
+        });
+    }
+
+    // S'abonner à la queue des alertes de trafic
+    subscribeToAlertQueue(queueName) {
+        this.stompClient.subscribe(queueName, (message) => {
+            console.log("Message d'alerte reçu:", message.body);
+            this.handleAlertMessage(JSON.parse(message.body));
         });
     }
 
@@ -90,7 +101,7 @@ export class MessageClient {
     }
 
     // Gérer les messages reçus
-    handleMessage(message) {
+    handleItineraryMessage(message) {
         if (message.UserId === this.userId && message.type != "update") {
             // Émettre un événement global avec les détails de l'instruction
             window.dispatchEvent(
@@ -112,6 +123,21 @@ export class MessageClient {
                         arrived: message.Arrived,
                     },
                 })
+            );
+        }
+    }
+
+    handleAlertMessage(message) {
+        console.log("Alerte reçue:", message);
+        console.log("this.userId:", this.userId);
+        console.log("UserId:", message.UserId);
+
+        if (message.UserId === this.userId /*&& message.type != "update"*/) {
+            // Émettre un événement global avec les détails de l'instruction
+            showCustomNotification(
+                message.Title,
+                message.Description,
+                message.Severity
             );
         }
     }
