@@ -121,8 +121,9 @@ window.addEventListener("displayInstructionComponent", (event) => {
 });
 
 window.addEventListener("displayInputLocationComponent", (event) => {
+    const { reset } = event.detail;
     displayInstructionComponent(false);
-    displayInputLocationComponent(true);
+    displayInputLocationComponent(true, reset);
 });
 
 window.addEventListener("displayNotif", (event) => {
@@ -134,11 +135,14 @@ function centerMap(lat, lon) {
     map.setView([lat, lon], 13);
 }
 
-function displayInputLocationComponent(display) {
+function displayInputLocationComponent(display, reset = false) {
     const inputLocationComponent = document.getElementById(
         "inputLocationComponent"
     );
     inputLocationComponent.style.display = display ? "block" : "none";
+    if (reset) {
+        window.dispatchEvent(new CustomEvent("resetInputLocationComponent"));
+    }
 }
 
 function displayInstructionComponent(display) {
@@ -236,6 +240,19 @@ window.addEventListener("drawItineraryDirect", (event) => {
     displayItineraryOnMap([polylineFoot], []);
 });
 
+window.addEventListener("displayInputLocationComponent", (event) => {
+    displayInstructionComponent(false);
+    displayInputLocationComponent(true);
+});
+
+function hideIconsOnMap() {
+    map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
+}
+
 function displayHubsOnMap(hub1, hub2) {
     if (hub1) {
         const hub1Marker = L.marker([hub1.Latitude, hub1.Longitude], {
@@ -272,5 +289,33 @@ window.addEventListener("showHubs", (event) => {
 });
 
 window.addEventListener("stopNavigation", (event) => {
-    hideItineraryOnMap();
+    console.log("Arrêt de la navigation");
+    const { arrived } = event.detail;
+    window.dispatchEvent(
+        new CustomEvent("displayInputLocationComponent", {
+            detail: { reset: true },
+        })
+    );
+    resetMap();
+    console.log("Arrived:", arrived);
+    if (arrived) {
+        showCustomNotification(
+            "Arrivé",
+            "Vous êtes arrivé à destination !",
+            "info"
+        );
+    } else {
+        showCustomNotification(
+            "Arrêt de la navigation",
+            "La navigation a été arrêtée.",
+            "error"
+        );
+    }
 });
+
+function resetMap() {
+    console.log("Resetting map");
+    // map.setZoom(13);
+    hideItineraryOnMap();
+    hideIconsOnMap();
+}

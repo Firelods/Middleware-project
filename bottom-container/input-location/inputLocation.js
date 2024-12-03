@@ -80,6 +80,12 @@ class LocationComponent extends HTMLElement {
             }, 200);
         });
 
+        window.addEventListener("resetInputLocationComponent", (event) => {
+            departureInput.value = "";
+            arrivalInput.value = "";
+            this.chosenLocation = {};
+        });
+
         startNavigationButton.addEventListener("click", () => {
             const departure = this.shadowRoot.getElementById("departure").value;
             const departureLat = this.chosenLocation.departureLat;
@@ -225,7 +231,10 @@ class LocationComponent extends HTMLElement {
                         break;
                 }
 
-                if (data.GetItineraryResult.Details.StartStation) {
+                if (
+                    data.GetItineraryResult.Details &&
+                    data.GetItineraryResult.Details.StartStation
+                ) {
                     window.dispatchEvent(
                         new CustomEvent("showHubs", {
                             detail: {

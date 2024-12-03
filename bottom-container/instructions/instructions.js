@@ -35,9 +35,10 @@ class InstructionsComponent extends HTMLElement {
             this.shadowRoot.getElementById("stop-navigation");
         stopNavigationButton.addEventListener("click", () => {
             window.dispatchEvent(
-                new CustomEvent("displayInputLocationComponent")
+                new CustomEvent("stopNavigation", {
+                    detail: { arrived: false },
+                })
             );
-            window.dispatchEvent(new CustomEvent("stopNavigation"));
         });
 
         // Instruction cliquable pour demander la suivante
@@ -65,6 +66,7 @@ class InstructionsComponent extends HTMLElement {
                 duration,
                 coordinates,
                 bearing,
+                arrived,
             } = event.detail;
 
             this.updateDirectionInstructions(instruction);
@@ -73,8 +75,23 @@ class InstructionsComponent extends HTMLElement {
             const zoom = this.calculateZoomBasedOnDistance(distance);
             this.updateMap(coordinates.lat, coordinates.lng, zoom, bearing);
 
+            setTimeout(() => {
+                this.processArrivedState(arrived);
+            }, 3000);
+
             console.log(`Instruction mise à jour : ${instruction}`);
         });
+    }
+
+    processArrivedState(arrived) {
+        console.log("Process arrived state:", arrived);
+        if (arrived) {
+            window.dispatchEvent(
+                new CustomEvent("stopNavigation", {
+                    detail: { arrived },
+                })
+            );
+        }
     }
 
     updateMap(lat, lon, zoom, bearing) {
@@ -149,7 +166,8 @@ class InstructionsComponent extends HTMLElement {
     }
 
     updateDirectionInstructions(instructions) {
-        const directionInstructions = this.shadowRoot.getElementById("instruction");
+        const directionInstructions =
+            this.shadowRoot.getElementById("instruction");
         directionInstructions.textContent = instructions;
     }
 }
