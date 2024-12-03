@@ -1,4 +1,5 @@
 import { MessageClient } from "./message-client.js";
+import { showCustomNotification } from "../notification/notification.js";
 
 export class ApiClient {
     apiClientInstance = null;
@@ -35,7 +36,8 @@ export class ApiClient {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+                const errorMessage = await response.text();
+                throw new Error(`HTTP ${response.status} : ${errorMessage}`);
             }
             // parse the response
             const data = await response.json();
@@ -49,7 +51,8 @@ export class ApiClient {
 
             return data;
         } catch (error) {
-            console.error("Erreur lors de l’appel API:", error);
+            console.error("Erreur lors de l'appel API:", error);
+            showCustomNotification("Erreur du serveur ", error, "error");
             throw error;
         }
     }
