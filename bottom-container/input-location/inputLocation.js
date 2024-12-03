@@ -154,7 +154,8 @@ class LocationComponent extends HTMLElement {
         arrivalCity
     ) {
         console.log("Lancement de la navigation");
-
+        const loader = this.shadowRoot.getElementById("start-loader");
+        loader.style.display = "block";
         const apiClient = new ApiClient("http://localhost:8081");
         apiClient
             .getItinerary(
@@ -177,6 +178,7 @@ class LocationComponent extends HTMLElement {
                         },
                     })
                 );
+                loader.style.display = "none";
                 switch (data.GetItineraryResult.Type) {
                     case "InterCityRoute":
                         window.dispatchEvent(
@@ -252,6 +254,7 @@ class LocationComponent extends HTMLElement {
             })
             .catch((error) => {
                 console.error("Erreur:", error);
+                loader.style.display = "none";
             });
     }
 
