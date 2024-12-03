@@ -231,22 +231,6 @@ class LocationComponent extends HTMLElement {
                         break;
                 }
 
-                if (
-                    data.GetItineraryResult.Details &&
-                    data.GetItineraryResult.Details.StartStation
-                ) {
-                    window.dispatchEvent(
-                        new CustomEvent("showHubs", {
-                            detail: {
-                                hub1: data.GetItineraryResult.Details
-                                    .StartStation,
-                                hub2: data.GetItineraryResult.Details
-                                    .EndStation,
-                            },
-                        })
-                    );
-                }
-
                 window.dispatchEvent(
                     new CustomEvent("displayInstructionComponent")
                 );

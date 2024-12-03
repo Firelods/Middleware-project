@@ -173,6 +173,36 @@ function displayItineraryOnMap(footPolylines = [], bikePolylines = []) {
     hideItineraryOnMap();
     currentPolylines = [];
 
+    // Fonction pour ajouter des marqueurs aux extrémités
+    function addMarkersForPolyline(polylineCoords, labelStart, labelEnd) {
+        if (polylineCoords.length > 0) {
+            const startPoint = polylineCoords[0];
+            const endPoint = polylineCoords[polylineCoords.length - 1];
+
+            L.marker(startPoint, {
+                icon: L.icon({
+                    iconUrl: "img/hub.svg",
+                    iconSize: [40, 55],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                }),
+            })
+                .addTo(map)
+                .bindPopup(labelStart);
+
+            L.marker(endPoint, {
+                icon: L.icon({
+                    iconUrl: "img/hub.svg",
+                    iconSize: [40, 55],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                }),
+            })
+                .addTo(map)
+                .bindPopup(labelEnd);
+        }
+    }
+
     // Ajouter les polylignes en vélo (ligne continue)
     bikePolylines.forEach((polylineData) => {
         const decodedBike = polyline.decode(polylineData);
@@ -184,6 +214,9 @@ function displayItineraryOnMap(footPolylines = [], bikePolylines = []) {
             }
         ).addTo(map);
         currentPolylines.push(bikePolyline);
+
+        // Ajouter des marqueurs pour cette polyligne
+        addMarkersForPolyline(decodedBike, "Départ Vélo", "Arrivée Vélo");
     });
 
     // Ajouter les polylignes à pied (en pointillé)
@@ -212,6 +245,7 @@ function displayItineraryOnMap(footPolylines = [], bikePolylines = []) {
         });
     }
 }
+
 
 window.addEventListener("drawItineraryCombined", (event) => {
     const { polylineFoot1, polylineFoot2, polylineBike } = event.detail;
@@ -252,41 +286,6 @@ function hideIconsOnMap() {
         }
     });
 }
-
-function displayHubsOnMap(hub1, hub2) {
-    if (hub1) {
-        const hub1Marker = L.marker([hub1.Latitude, hub1.Longitude], {
-            icon: L.icon({
-                iconUrl: "img/hub.svg",
-                iconSize: [40, 55],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-            }),
-        })
-            .addTo(map)
-            .bindPopup("Hub 1");
-        hub1Marker.openPopup();
-    }
-
-    if (hub2) {
-        const hub2Marker = L.marker([hub2.Latitude, hub2.Longitude], {
-            icon: L.icon({
-                iconUrl: "img/hub.svg",
-                iconSize: [40, 55],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-            }),
-        })
-            .addTo(map)
-            .bindPopup("Hub 2");
-        hub2Marker.openPopup();
-    }
-}
-
-window.addEventListener("showHubs", (event) => {
-    const { hub1, hub2 } = event.detail;
-    displayHubsOnMap(hub1, hub2);
-});
 
 window.addEventListener("stopNavigation", (event) => {
     console.log("Arrêt de la navigation");
