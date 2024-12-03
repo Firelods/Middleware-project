@@ -1,26 +1,41 @@
 <template id="location-template">
-    <link rel="stylesheet" href="bottom-container/input-location/inputLocation.css" />
+    <link
+        rel="stylesheet"
+        href="bottom-container/input-location/inputLocation.css"
+    />
     <link rel="stylesheet" href="../../bottom-container/bottomContainer.css" />
     <div class="bottom-container">
         <div class="bottom">
             <h3>Sélectionner la localisation</h3>
             <div class="input-group">
                 <label for="departure">Départ</label>
-                <input
-                    type="text"
-                    id="departure"
-                    placeholder="43.6145995, 7.0746862"
-                />
+                <div class="input-line">
+                    <input
+                        type="text"
+                        id="departure"
+                        placeholder="43.6145995, 7.0746862"
+                    />
+                    <span id="departure-loader" class="loader"></span>
+                </div>
             </div>
             <div class="input-group">
                 <label for="arrival">Arrivée</label>
-                <input
-                    type="text"
-                    id="arrival"
-                    placeholder="Saisissez la destination..."
-                />
+                <div class="input-line">
+                    <input
+                        type="text"
+                        id="arrival"
+                        placeholder="Saisissez la destination..."
+                    />
+                    <span id="arrival-loader" class="loader"></span>
+                </div>
             </div>
-            <button id="start-navigation" class="big-button">Lancer la navigation</button>
+            
+            <div class="input-line">
+            <button id="start-navigation" class="big-button">
+                Lancer la navigation
+            </button>
+            <span id="start-loader" class="loader"></span>
+            </div>
         </div>
     </div>
 </template>

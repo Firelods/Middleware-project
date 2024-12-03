@@ -154,7 +154,8 @@ class LocationComponent extends HTMLElement {
         arrivalCity
     ) {
         console.log("Lancement de la navigation");
-
+        const loader = this.shadowRoot.getElementById("start-loader");
+        loader.style.display = "block";
         const apiClient = new ApiClient("http://localhost:8081");
         apiClient
             .getItinerary(
@@ -177,6 +178,7 @@ class LocationComponent extends HTMLElement {
                         },
                     })
                 );
+                loader.style.display = "none";
                 switch (data.GetItineraryResult.Type) {
                     case "InterCityRoute":
                         window.dispatchEvent(
@@ -230,21 +232,21 @@ class LocationComponent extends HTMLElement {
                         );
                         break;
                 }
-                try{
-                    if (data.GetItineraryResult.Route.Routes[0].Summary){
-
+                try {
+                    if (data.GetItineraryResult.Route.Routes[0].Summary) {
                         window.dispatchEvent(
                             new CustomEvent("showDuration", {
                                 detail: {
-                                    duration: data.GetItineraryResult.Route.Routes[0].Summary.Duration,
+                                    duration:
+                                        data.GetItineraryResult.Route.Routes[0]
+                                            .Summary.Duration,
                                 },
                             })
                         );
                     }
-                }catch{
-                    console.log("No summary given")
+                } catch {
+                    console.log("No summary given");
                 }
-                
 
                 window.dispatchEvent(
                     new CustomEvent("displayInstructionComponent")
@@ -252,10 +254,14 @@ class LocationComponent extends HTMLElement {
             })
             .catch((error) => {
                 console.error("Erreur:", error);
+                loader.style.display = "none";
             });
     }
 
     async autocomplete(query, inputId) {
+        console.log(`${inputId}-loader`);
+        const loader = this.shadowRoot.getElementById(`${inputId}-loader`);
+        loader.style.display = "block";
         const url = `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
             query
         )}&limit=5`;
@@ -270,11 +276,13 @@ class LocationComponent extends HTMLElement {
                 const suggestions = [];
                 this.showSuggestions(suggestions, inputId);
             }
+            loader.style.display = "none";
         } catch (error) {
             console.error(
                 "Erreur lors de la récupération des suggestions :",
                 error
             );
+            loader.style.display = "none";
         }
     }
 
