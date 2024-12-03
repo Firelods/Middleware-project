@@ -75,10 +75,11 @@ export class MessageClient {
                         distance: message.Distance,
                         duration: message.Duration,
                         coordinates: {
-                            lat: message.Maneuver.Location[1],
-                            lng: message.Maneuver.Location[0],
+                            lat: message.Maneuver.Location ? message.Maneuver.Location[1] : null,
+                            lng: message.Maneuver.Location ? message.Maneuver.Location[0] : null,
                         },
                         bearing: message.Maneuver.bearing_before,
+                        arrived: message.Arrived
                     },
                 })
             );
