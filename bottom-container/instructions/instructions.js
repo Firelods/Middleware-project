@@ -54,6 +54,11 @@ class InstructionsComponent extends HTMLElement {
                 new CustomEvent("requestNextInstruction")
             );
         });
+
+        window.addEventListener("showDuration", (event) => {
+            const { duration } = event.detail;
+            this.updateArrivalTimeFromDuration(duration);
+        });
     }
 
     listenForNewInstructions() {
@@ -63,7 +68,6 @@ class InstructionsComponent extends HTMLElement {
                 instruction,
                 direction,
                 distance,
-                duration,
                 coordinates,
                 bearing,
                 arrived,
@@ -71,7 +75,6 @@ class InstructionsComponent extends HTMLElement {
 
             this.updateDirectionInstructions(instruction);
             this.updateDirectionIcon(direction);
-            this.updateArrivalTimeFromDuration(duration);
             const zoom = this.calculateZoomBasedOnDistance(distance);
             this.updateMap(coordinates.lat, coordinates.lng, zoom, bearing);
 
@@ -114,7 +117,7 @@ class InstructionsComponent extends HTMLElement {
         const currentDate = new Date();
         const minutesToAdd = Math.ceil(duration);
         const arrivalDate = new Date(
-            currentDate.getTime() + minutesToAdd * 60000
+            currentDate.getTime() + minutesToAdd * 1000
         );
 
         this.updateArrivalTime(
@@ -133,7 +136,7 @@ class InstructionsComponent extends HTMLElement {
         const formattedHour = hour < 10 ? `0${hour}` : hour;
         const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
 
-        const arrivalTime = this.shadowRoot.getElementById("arrival");
+        const arrivalTime = this.shadowRoot.getElementById("arrivalTime");
         arrivalTime.textContent = `${formattedHour}h${formattedMinutes}`;
     }
 
